@@ -1,6 +1,7 @@
 package com.example.readstack;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -47,12 +48,10 @@ public class AddBook extends AppCompatActivity{
         publish_date_view.setText(published_date);
         title_view.setText(title);
         desc_view.setText(desc);
-        //Log.d("Picasso", thumbnail_link);
         Picasso.get().load(thumbnail_link).into(thumbnail);
 
         add_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                //Log.d("Click", "add_button clicked");
                 Intent i = new Intent(AddBook.this, MainList.class);
                 i.putExtra("author", author);
                 i.putExtra("publisher", publisher);
@@ -69,7 +68,10 @@ public class AddBook extends AppCompatActivity{
 
         more_info_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Log.d("Click", "more_info_button clicked");
+                //Log.d("Info_Click", "more_info_button clicked");
+                Intent i = new Intent();
+                i.setData(Uri.parse(info_link));
+                AddBook.this.startActivity(i);
             }
         });
     }

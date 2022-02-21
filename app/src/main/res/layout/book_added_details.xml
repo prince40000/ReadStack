@@ -22,8 +22,8 @@
 
             <ImageView
                 android:id="@+id/thumbnail_view_add_detail"
-                android:layout_width="163dp"
-                android:layout_height="wrap_content"
+                android:layout_width="432px"
+                android:layout_height="733px"
                 android:scaleType="centerCrop"
                 app:srcCompat="@drawable/content" />
 

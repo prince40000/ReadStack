@@ -1,6 +1,9 @@
 package com.example.readstack;
+import android.util.Log;
+
 import java.util.ArrayList;
 public class BookStore{
+    int removeIndex;
     public ArrayList<BookItem> books;
     public BookStore(ArrayList<BookItem> bookDetails){
         books = new ArrayList<BookItem>();
@@ -17,7 +20,25 @@ public class BookStore{
     public void addBook(BookItem book){
         books.add(book);
     }
+    public void removeBook(String bookId){ books.remove(findIndex(bookId)); }
     public int length(){
         return books.size();
+    }
+
+    public String toString(){
+        String output = "";
+        for(int i = 0; i < books.size(); i++)
+        { output = output + "\n" + books.get(i).toString();}
+        return output;
+    }
+
+    public int findIndex(String bookId){
+        for(int i = 0; i < books.size(); i++){
+            if(books.get(i).id.equals(bookId)) {
+                return(i);
+            }
+        }
+        //This should never happen
+        return(-1);
     }
 }

@@ -52,7 +52,7 @@ public class MainList extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if(!caller.equals("MainActivity")) {
+        if(!caller.equals("MainActivity") && !caller.equals("BookAddedDetails")) {
             newBook = createBook();
             bookDetails.add(newBook);
             try {
@@ -80,6 +80,7 @@ public class MainList extends AppCompatActivity {
             myRecycler.setLayoutManager(layout);
             myRecycler.setAdapter(myAdapter);
         }
+
         else{
             try {
                 reader = new FileReader(file.getAbsoluteFile());
@@ -124,7 +125,7 @@ public class MainList extends AppCompatActivity {
         }
     }
 
-    public JSONObject convertBookToJSON(BookItem book, JSONArray bookList){
+    /*public JSONObject convertBookToJSON(BookItem book, JSONArray bookList){
         //JSONArray bookList = new JSONArray();
         JSONObject jsonBook = new JSONObject();
         try {
@@ -149,7 +150,7 @@ public class MainList extends AppCompatActivity {
         JSONArray bookList = new JSONArray();
         bookList.put(jsonBook);
         writeToFile(bookList.toString(), this);
-    }
+    }*/
 
     public void create(){
         bookDetails = new ArrayList<>();

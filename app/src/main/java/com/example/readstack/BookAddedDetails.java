@@ -1,6 +1,8 @@
 package com.example.readstack;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -12,14 +14,31 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+
 public class BookAddedDetails extends AppCompatActivity{
-    String author, publisher, published_date, title, desc, thumbnail_link, info_link;
+    String author, publisher, published_date, title, desc, thumbnail_link, info_link, id;
+    BookItem book;
     TextView author_view, publisher_view, publish_date_view, title_view;
     EditText comments;
     ImageView thumbnail;
     Button remove_button, more_info_button;
+    static final String FILE_NAME= "library.json";
+    BookStore bookStore;
+    Reader reader;
+    File file;
+    FileOutputStream fos;
+    Gson gson = new Gson();
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -40,6 +59,9 @@ public class BookAddedDetails extends AppCompatActivity{
         desc = getIntent().getStringExtra("book_description");
         thumbnail_link = getIntent().getStringExtra("thumbnail_link");
         info_link = getIntent().getStringExtra("info_link");
+        id = getIntent().getStringExtra("id");
+        book = (BookItem) getIntent().getSerializableExtra("book_item");
+
 
         author_view.setText(author);
         publisher_view.setText(publisher);
@@ -66,8 +88,52 @@ public class BookAddedDetails extends AppCompatActivity{
 
         more_info_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Log.d("Click", "more_info_button clicked");
+                //Log.d("Info_Click", "more_info_button clicked");
+                Intent i = new Intent();
+                i.setData(Uri.parse(book.info_link));
+                BookAddedDetails.this.startActivity(i);
             }
         });
+
+        //Remove Button
+        remove_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    //Opens file and reader, imports bookStore from JSON
+                    file = new File(getFilesDir(), FILE_NAME);
+                    reader = new FileReader(file.getAbsoluteFile());
+                    bookStore = gson.fromJson(reader, BookStore.class);
+
+                    //Deletes existing JSON file, creates a new blank one
+                    file.delete();
+                    fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
+                    fos.close();
+
+                    //Removes book from bookStore, writes new bookStore to JSON
+                    bookStore.removeBook(book.id);
+                    writeToFile(gson.toJson(bookStore));
+                    reader.close();
+
+                    //Moves back to main display screen
+                    Intent i = new Intent(BookAddedDetails.this, MainList.class);
+                    i.putExtra("calling_class", "BookAddedDetails");
+                    BookAddedDetails.this.startActivity(i);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    public void writeToFile(String json){
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput(FILE_NAME, Context.MODE_APPEND));
+            outputStreamWriter.write(json);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
     }
 }

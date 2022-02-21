@@ -1,6 +1,8 @@
 package com.example.readstack;
 
-public class BookItem{
+import java.io.Serializable;
+
+public class BookItem implements Serializable {
     String author_name;
     String publisher_name;
     String published_date;

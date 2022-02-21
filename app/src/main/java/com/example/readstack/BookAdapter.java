@@ -2,6 +2,7 @@ package com.example.readstack;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,6 +72,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.MyViewHolder> 
                     //Log.d("Picasso", bookItem.getThumbnail_address());
                     i.putExtra("info_link", bookItem.getInfo_link());
                     i.putExtra("id", bookItem.getId());
+                    i.putExtra("book_item", bookItem);
                     myContext.startActivity(i);
                 }
             }

@@ -3,20 +3,13 @@ package com.example.readstack;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Switch;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.widget.AutoScrollHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,7 +29,7 @@ import java.util.ArrayList;
 public class BookSearch extends AppCompatActivity {
 
     private RequestQueue myRequestQueue;
-    private ArrayList<BookItem> bookDetails;
+    private ArrayList<BookItem> searchResults;
     private EditText searchBar;
     private Button searchButton;
     private Spinner search_spinner;
@@ -58,14 +51,14 @@ public class BookSearch extends AppCompatActivity {
                     //Log.d("C", "fumble");
                 }
                 else{
-                    getBookDetails(searchBar.getText().toString());
+                    getSearchResults(searchBar.getText().toString());
                     //Log.d("C", "made it here!");
                 }
             }
         });
     }
-    public void getBookDetails(String bookTitle){
-        bookDetails = new ArrayList<>();
+    public void getSearchResults(String bookTitle){
+        searchResults = new ArrayList<>();
         myRequestQueue = Volley.newRequestQueue(BookSearch.this);
         myRequestQueue.getCache().clear();
         String url;
@@ -116,9 +109,9 @@ public class BookSearch extends AppCompatActivity {
                             author = "No author found";
                         }
                         BookItem book = new BookItem(author, publisher, published_date, title, description, thumbnail, info_link, id);
-                        bookDetails.add(book);
+                        searchResults.add(book);
 
-                        BookAdapter myAdapter = new BookAdapter(bookDetails, BookSearch.this, "BookSearch");
+                        BookAdapter myAdapter = new BookAdapter(searchResults, BookSearch.this, "BookSearch");
                         LinearLayoutManager layout = new LinearLayoutManager(BookSearch.this, RecyclerView.VERTICAL, false);
                         RecyclerView myRecycler = (RecyclerView) findViewById(R.id.search_resaults_list);
                         myRecycler.setLayoutManager(layout);
