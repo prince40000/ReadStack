@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 
-public class MainList extends AppCompatActivity {
+public class MainList extends AppCompatActivity{
     private BookItem newBook;
     private ArrayList<BookItem> bookDetails, printList;
     private BookStore bookStore, newBookStore;
@@ -36,6 +37,7 @@ public class MainList extends AppCompatActivity {
     private Reader reader;
     private File file;
     private Gson gson;
+    private BookGridAdapter gridAdapter;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_list);
@@ -74,11 +76,20 @@ public class MainList extends AppCompatActivity {
                 printList.add(newBookStore.getBook(i));
             }
             writeToFile(gson.toJson(newBookStore), this);
+            /*
             BookAdapter myAdapter = new BookAdapter(printList, MainList.this, "MainList");
             LinearLayoutManager layout = new LinearLayoutManager(MainList.this, RecyclerView.VERTICAL, false);
             RecyclerView myRecycler = (RecyclerView) findViewById(R.id.library_list);
             myRecycler.setLayoutManager(layout);
             myRecycler.setAdapter(myAdapter);
+            */
+            //GridLayoutManager newLayout = new GridLayoutManager(MainList.this, RecyclerView, false);
+
+            RecyclerView recyclerView = findViewById(R.id.library_list);
+            int numberOfColumns = 4;
+            recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
+            gridAdapter = new BookGridAdapter(this, printList, "MainList");
+            recyclerView.setAdapter(gridAdapter);
         }
 
         else{
@@ -92,11 +103,18 @@ public class MainList extends AppCompatActivity {
             }
             catch(Exception e){
             }
+            /*
             BookAdapter myAdapter = new BookAdapter(printList, MainList.this, "MainList");
             LinearLayoutManager layout = new LinearLayoutManager(MainList.this, RecyclerView.VERTICAL, false);
             RecyclerView myRecycler = (RecyclerView) findViewById(R.id.library_list);
             myRecycler.setLayoutManager(layout);
             myRecycler.setAdapter(myAdapter);
+            */
+            RecyclerView recyclerView = findViewById(R.id.library_list);
+            int numberOfColumns = 4;
+            recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
+            gridAdapter = new BookGridAdapter(this, printList, "MainList");
+            recyclerView.setAdapter(gridAdapter);
         }
     }
 
