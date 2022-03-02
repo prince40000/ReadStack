@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:focusable="false"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <RelativeLayout
@@ -18,8 +19,8 @@
 
             <ImageView
                 android:id="@+id/thumbnail_view_item"
-                android:layout_width="192px"
-                android:layout_height="293px"
+                android:layout_width="80dp"
+                android:layout_height="125dp"
                 app:srcCompat="@drawable/content"
                 android:scaleType="centerCrop"/>
 
@@ -32,25 +33,39 @@
                 <TextView
                     android:id="@+id/book_title"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".25"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMaxTextSize="25dp"
+                    android:autoSizeMinTextSize="12dp"
                     android:text="TextView" />
 
                 <TextView
                     android:id="@+id/author_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".25"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMaxTextSize="25dp"
+                    android:autoSizeMinTextSize="12dp"
                     android:text="TextView" />
 
                 <TextView
                     android:id="@+id/publisher"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".25"                    android:autoSizeTextType="uniform"
+                    android:autoSizeMaxTextSize="25dp"
+                    android:autoSizeMinTextSize="12dp"
                     android:text="TextView" />
 
                 <TextView
                     android:id="@+id/published_date"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".25"                    android:autoSizeTextType="uniform"
+                    android:autoSizeMaxTextSize="25dp"
+                    android:autoSizeMinTextSize="12dp"
                     android:text="TextView" />
             </LinearLayout>
         </LinearLayout>

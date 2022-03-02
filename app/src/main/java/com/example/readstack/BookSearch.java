@@ -1,8 +1,10 @@
 package com.example.readstack;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.Key;
 import java.util.ArrayList;
 
 public class BookSearch extends AppCompatActivity {
@@ -43,7 +46,13 @@ public class BookSearch extends AppCompatActivity {
         search_spinner.setAdapter(adapter);
         searchBar = findViewById(R.id.search_bar_view);
         searchButton = findViewById(R.id.search_button);
-
+        /*try {
+            if (getIntent().getStringExtra("calling_class").equals("AddBook")) {
+                searchBar.setText(getIntent().getStringExtra("title"));
+            }
+        }
+        catch (RuntimeException e){
+        }*/
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,5 +139,18 @@ public class BookSearch extends AppCompatActivity {
             }
         });
         myQueue.add(bookRequest);
+    }
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        switch(keyCode){
+            case KeyEvent.KEYCODE_ENTER:
+                searchButton.callOnClick();
+                return true;
+            case KeyEvent.KEYCODE_BACK:
+                Intent i = new Intent(BookSearch.this, MainList.class);
+                i.putExtra("calling_class", "BookSearch");
+                BookSearch.this.startActivity(i);
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
     }
 }

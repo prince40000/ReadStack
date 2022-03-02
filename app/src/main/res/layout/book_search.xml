@@ -38,6 +38,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_resaults_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:focusable="false"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -74,5 +75,16 @@ public class AddBook extends AppCompatActivity{
                 AddBook.this.startActivity(i);
             }
         });
+    }
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        switch(keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                Intent i = new Intent(AddBook.this, BookSearch.class);
+                i.putExtra("calling_class", "AddBook");
+                //i.putExtra("title", title);
+                AddBook.this.startActivity(i);
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
     }
 }

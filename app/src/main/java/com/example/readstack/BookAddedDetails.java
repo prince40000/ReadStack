@@ -29,7 +29,7 @@ import java.io.Reader;
 public class BookAddedDetails extends AppCompatActivity{
     String author, publisher, published_date, title, desc, thumbnail_link, info_link, id;
     BookItem book;
-    TextView author_view, publisher_view, publish_date_view, title_view;
+    TextView author_view, publisher_view, publish_date_view, title_view, description;
     EditText comments;
     ImageView thumbnail;
     Button remove_button, more_info_button;
@@ -42,7 +42,7 @@ public class BookAddedDetails extends AppCompatActivity{
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.book_added_details);
+        setContentView(R.layout.book_added_details2);
         author_view = findViewById(R.id.author_text);
         publisher_view = findViewById(R.id.publisher_text);
         publish_date_view = findViewById(R.id.publish_date_text);
@@ -50,6 +50,7 @@ public class BookAddedDetails extends AppCompatActivity{
         thumbnail = findViewById(R.id.thumbnail_view_add_detail);
         remove_button = findViewById(R.id.remove_button);
         more_info_button = findViewById(R.id.more_info_button_add);
+        description = findViewById(R.id.description_text);
         comments = findViewById(R.id.comments_text);
 
         author = getIntent().getStringExtra("author");
@@ -62,10 +63,10 @@ public class BookAddedDetails extends AppCompatActivity{
         id = getIntent().getStringExtra("id");
         book = (BookItem) getIntent().getSerializableExtra("book_item");
 
-
         author_view.setText(author);
         publisher_view.setText(publisher);
         publish_date_view.setText(published_date);
+        description.setText(desc);
         title_view.setText(title);
         //Log.d("Picasso", thumbnail_link);
         Picasso.get().load(thumbnail_link).into(thumbnail);
