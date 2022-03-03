@@ -10,9 +10,10 @@
         android:id="@+id/logo_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@drawable/ic_launcher_background"
+        app:srcCompat="@drawable/ic_readstack"
         tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="0dp" />
+        tools:layout_editor_absoluteY="0dp"
+        tools:srcCompat="@drawable/ic_readstack" />
 
     <Button
         android:id="@+id/enter_button"
@@ -21,6 +22,27 @@
         android:text="Enter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/logo_view"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/logo_view" />
+        app:layout_constraintTop_toTopOf="@+id/logo_view"
+        app:layout_constraintVertical_bias="0.897" />
+
+    <TextView
+        android:id="@+id/appNameView"
+        android:layout_width="320dp"
+        android:layout_height="70dp"
+        android:autoText="false"
+        android:fontFamily="@font/readstack_font"
+        android:gravity="center"
+        android:text="ReadStack"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:autoSizeMaxTextSize="320dp"
+        app:autoSizeMinTextSize="12dp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.077" />
 </androidx.constraintlayout.widget.ConstraintLayout>

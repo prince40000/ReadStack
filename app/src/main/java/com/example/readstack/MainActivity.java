@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_screen);
+        getSupportActionBar().hide();
         Button enter_button = findViewById(R.id.enter_button);
         enter_button.setOnClickListener(enter);
     }

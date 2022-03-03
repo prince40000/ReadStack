@@ -41,4 +41,10 @@ public class BookStore{
         //This should never happen
         return(-1);
     }
+    public void duplicate(){
+        int size = books.size();
+        for(int i = 0; i < size; i++){
+            books.add(books.get(i));
+        }
+    }
 }

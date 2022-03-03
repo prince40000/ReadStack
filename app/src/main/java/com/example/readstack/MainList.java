@@ -3,46 +3,55 @@ package com.example.readstack;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class MainList extends AppCompatActivity{
-    private BookItem newBook;
+    private BookItem newBook, tempbook;
     private ArrayList<BookItem> bookDetails, printList;
-    private BookStore bookStore, newBookStore;
-    private FloatingActionButton new_button;
+    private BookStore bookStore, newBookStore, storedStore;
+    private FloatingActionButton new_button, debug_button;
     public String author, publisher, published_date, title, desc, thumbnail_link, info_link, id, caller;
     private static final String FILE_NAME="library.json";
     private FileOutputStream fos;
-    private Reader reader;
+    private Reader reader, exportReader, importReader;
     private File file;
     private Gson gson;
     private BookGridAdapter gridAdapter;
+
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_list);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        setContentView(R.layout.main_list_v2);
         create();
 
+        //CHECKS IF FILE EXISTS, CREATES OUTPUT STREAM IF IT DOES
         try {
             file = new File(getFilesDir(), FILE_NAME);
             if(!file.exists()){
@@ -54,7 +63,8 @@ public class MainList extends AppCompatActivity{
             e.printStackTrace();
         }
 
-        if(!caller.equals("MainActivity") && !caller.equals("BookAddedDetails")) {
+        //IF CLASS THAT CREATED THIS INTNENT ISN'T MAINACTIVITY OR BOOADDDEDDETAILS
+        if(caller.equals("AddBook")) {
             newBook = createBook();
             bookDetails.add(newBook);
             try {
@@ -76,15 +86,7 @@ public class MainList extends AppCompatActivity{
                 printList.add(newBookStore.getBook(i));
             }
             writeToFile(gson.toJson(newBookStore), this);
-            /*
-            BookAdapter myAdapter = new BookAdapter(printList, MainList.this, "MainList");
-            LinearLayoutManager layout = new LinearLayoutManager(MainList.this, RecyclerView.VERTICAL, false);
-            RecyclerView myRecycler = (RecyclerView) findViewById(R.id.library_list);
-            myRecycler.setLayoutManager(layout);
-            myRecycler.setAdapter(myAdapter);
-            */
-            //GridLayoutManager newLayout = new GridLayoutManager(MainList.this, RecyclerView, false);
-
+            caller = "";
             RecyclerView recyclerView = findViewById(R.id.library_list);
             int numberOfColumns = 4;
             recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
@@ -92,7 +94,9 @@ public class MainList extends AppCompatActivity{
             recyclerView.setAdapter(gridAdapter);
         }
 
+        //IF INTENT WAS CREATED BY MAIN ACTIVITY OR BOOK ADDDED DETAILS
         else{
+            //TRY READING LIST FROM FILE
             try {
                 reader = new FileReader(file.getAbsoluteFile());
                 bookStore = gson.fromJson(reader, BookStore.class);
@@ -103,13 +107,8 @@ public class MainList extends AppCompatActivity{
             }
             catch(Exception e){
             }
-            /*
-            BookAdapter myAdapter = new BookAdapter(printList, MainList.this, "MainList");
-            LinearLayoutManager layout = new LinearLayoutManager(MainList.this, RecyclerView.VERTICAL, false);
-            RecyclerView myRecycler = (RecyclerView) findViewById(R.id.library_list);
-            myRecycler.setLayoutManager(layout);
-            myRecycler.setAdapter(myAdapter);
-            */
+
+            //BINDS LIST TO GRID
             RecyclerView recyclerView = findViewById(R.id.library_list);
             int numberOfColumns = 4;
             recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
@@ -118,8 +117,54 @@ public class MainList extends AppCompatActivity{
         }
     }
 
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return(true);
+    }
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.menu_import:
+                Log.d("MENU", "Import Selected");
+                try{
+                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), FILE_NAME);
+                    importReader = new FileReader(file.getAbsolutePath());
+                    bookStore = gson.fromJson(importReader, BookStore.class);
+                    writeToFile(gson.toJson(bookStore), MainList.this);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    importReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                recreate();
+                return true;
+            case R.id.menu_export:
+                Log.d("MENU", "Export Selected");
+                try {
+                    exportReader = new FileReader(file.getAbsoluteFile());
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                storedStore = gson.fromJson(exportReader, BookStore.class);
+                writeToStorage(gson.toJson(storedStore), MainList.this);
+                return true;
+            case R.id.menu_clear:
+                Log.d("MENU", "Clear Selected");
+                file = new File(getFilesDir(), FILE_NAME);
+                file.delete();
+                bookStore = null;
+                printList = null;
+                recreate();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    //CREATING BOOK ITEM FROM EXTRAS
     public BookItem createBook(){
-        //CREATING BOOK ITEM FROM EXTRAS
         author = getIntent().getStringExtra("author");
         publisher = getIntent().getStringExtra("publisher");
         published_date = getIntent().getStringExtra("published_date");
@@ -132,6 +177,7 @@ public class MainList extends AppCompatActivity{
         return book;
     }
 
+    //WRITES JSON TO FILE_NAME
     public void writeToFile(String json, Context context){
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FILE_NAME, Context.MODE_APPEND));
@@ -142,34 +188,27 @@ public class MainList extends AppCompatActivity{
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
-
-    /*public JSONObject convertBookToJSON(BookItem book, JSONArray bookList){
-        //JSONArray bookList = new JSONArray();
-        JSONObject jsonBook = new JSONObject();
-        try {
-            //Log.d("Check", "Here");
-            jsonBook.put("id", book.getId());
-            jsonBook.put("title", book.getBook_title());
-            //Log.d("Test", book.getBook_title());
-            jsonBook.put("author", book.getAuthor_name());
-            jsonBook.put("publisher", book.getPublisher_name());
-            jsonBook.put("published_date", book.getPublished_date());
-            jsonBook.put("thumbnail", book.getThumbnail_address());
-            jsonBook.put("info", book.getInfo_link());
-            //bookList.put(jsonBook);
-            //return bookList;
-            return jsonBook;
+    public void writeToStorage(String json, Context context){
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            Log.d("ExtraWrite", "Can Write");
         }
-        catch (Exception e){
-            return null;
+        try {
+            File outFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FILE_NAME);
+            outFile.delete();
+            FileOutputStream outputStream = new FileOutputStream(outFile, true);
+            outputStream.write(json.getBytes(StandardCharsets.UTF_8));
+            outputStream.close();
+
+            Toast.makeText(getBaseContext(), "File exported to documents.",
+                    Toast.LENGTH_LONG).show();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
-    public void printJSON(JSONArray booklist, JSONObject jsonBook){
-        JSONArray bookList = new JSONArray();
-        bookList.put(jsonBook);
-        writeToFile(bookList.toString(), this);
-    }*/
 
+    //HANDLES VIEW
     public void create(){
         bookDetails = new ArrayList<>();
         printList = new ArrayList<>();
@@ -177,11 +216,38 @@ public class MainList extends AppCompatActivity{
         gson = new GsonBuilder().setPrettyPrinting().create();
         caller = getIntent().getStringExtra("calling_class");
         new_button = findViewById(R.id.new_book_button);
+        debug_button = findViewById(R.id.debug_button);
+
         new_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainList.this, BookSearch.class);
                 MainList.this.startActivity(i);
+            }
+        });
+        debug_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    reader = new FileReader(file.getAbsolutePath());
+                    storedStore = gson.fromJson(reader, BookStore.class);
+                    reader.close();
+                    storedStore.duplicate();
+                    file.delete();
+                    file.createNewFile();
+                    try {
+                        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(MainList.this.openFileOutput(FILE_NAME, Context.MODE_APPEND));
+                        outputStreamWriter.append(gson.toJson(storedStore));
+                        outputStreamWriter.close();
+                    }
+                    catch (IOException e) {
+                        Log.e("Exception", "File write failed: " + e.toString());
+                    }
+                }
+                catch (IOException e){
+                    newBookStore = new BookStore();
+                    newBookStore.addBook(newBook);
+                    //Log.d("CHECKTEST", String.valueOf(e));
+                }
             }
         });
     }

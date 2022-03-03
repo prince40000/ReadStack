@@ -137,10 +137,10 @@
                     android:orientation="vertical">
 
                     <Button
-                        android:id="@+id/button3"
+                        android:id="@+id/tag_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Button" />
+                        android:text="Add Tag" />
 
                     <Button
                         android:id="@+id/more_info_button_add"
@@ -161,11 +161,11 @@
                     android:orientation="vertical">
 
                     <Button
-                        android:id="@+id/button4"
+                        android:id="@+id/fav_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight=".5"
-                        android:text="Button" />
+                        android:text="Favorite" />
 
                     <Button
                         android:id="@+id/remove_button"
