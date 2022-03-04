@@ -1,6 +1,7 @@
 package com.example.readstack;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class BookItem implements Serializable {
     String author_name;
@@ -11,7 +12,8 @@ public class BookItem implements Serializable {
     String thumbnail_address;
     String info_link;
     String id;
-    public BookItem(String author_name, String publisher_name, String published_date, String book_title, String book_description, String thumbnail_address,String info_link, String id){
+    ArrayList<String> tags;
+    public BookItem(String author_name, String publisher_name, String published_date, String book_title, String book_description, String thumbnail_address,String info_link, String id, ArrayList<String> tags){
         this.author_name = author_name;
         this.publisher_name = publisher_name;
         this.published_date = published_date;
@@ -20,6 +22,7 @@ public class BookItem implements Serializable {
         this.thumbnail_address = thumbnail_address;
         this.info_link = info_link;
         this.id = id;
+        this.tags = tags;
     }
 
     public String getAuthor_name(){

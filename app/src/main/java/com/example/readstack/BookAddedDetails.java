@@ -1,9 +1,11 @@
 package com.example.readstack;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -25,14 +28,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.util.ArrayList;
 
 public class BookAddedDetails extends AppCompatActivity{
     String author, publisher, published_date, title, desc, thumbnail_link, info_link, id;
+    ArrayList<String> tagList = new ArrayList<>();
+    ArrayList<String> addTags = new ArrayList<>();
     BookItem book;
     TextView author_view, publisher_view, publish_date_view, title_view, description;
     EditText comments;
     ImageView thumbnail;
-    Button remove_button, more_info_button;
+    Button remove_button, more_info_button, tag_button, favorite_button;
     static final String FILE_NAME= "library.json";
     BookStore bookStore;
     Reader reader;
@@ -52,6 +58,8 @@ public class BookAddedDetails extends AppCompatActivity{
         more_info_button = findViewById(R.id.more_info_button_add);
         description = findViewById(R.id.description_text);
         comments = findViewById(R.id.comments_text);
+        tag_button = findViewById(R.id.tag_button);
+        favorite_button = findViewById(R.id.fav_button);
 
         author = getIntent().getStringExtra("author");
         publisher = getIntent().getStringExtra("publisher");
@@ -68,28 +76,17 @@ public class BookAddedDetails extends AppCompatActivity{
         publish_date_view.setText(published_date);
         description.setText(desc);
         title_view.setText(title);
-        //Log.d("Picasso", thumbnail_link);
         Picasso.get().load(thumbnail_link).into(thumbnail);
 
-        /*add_button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                Log.d("Click", "add_button clicked");
-                Intent i = new Intent(AddBook.this, MainList.class);
-                i.putExtra("author", author);
-                i.putExtra("publisher", publisher);
-                i.putExtra("published_date", published_date);
-                i.putExtra("title", title);
-                i.putExtra("book_description", desc);
-                i.putExtra("thumbnail_link", thumbnail_link);
-                i.putExtra("info_link", info_link);
-                i.putExtra("calling_class", "AddBook");
-                AddBook.this.startActivity(i);
+        tag_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTagList();
             }
-        });*/
+        });
 
         more_info_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                //Log.d("Info_Click", "more_info_button clicked");
                 Intent i = new Intent();
                 i.setData(Uri.parse(book.info_link));
                 BookAddedDetails.this.startActivity(i);
@@ -136,5 +133,70 @@ public class BookAddedDetails extends AppCompatActivity{
         catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
         }
+    }
+
+    public void showTagList(){
+        // setup the alert builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Tags");
+
+        // add a checkbox list
+        boolean[] checkedItems = {false, false, false, false, false};
+        String[] tagDisplayArray = tagList.toArray(new String[0]);
+        builder.setMultiChoiceItems(tagDisplayArray, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+               String toAdd = tagDisplayArray[which];
+               addTags.add(toAdd);
+               try{
+                   for(int i = 0; i < addTags.size(); i++) {
+                       book.tags.add(addTags.get(i));
+                   }
+               }
+               catch (Exception e){
+
+               }
+            }
+        });
+
+        // add OK and Cancel buttons
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // user clicked OK
+            }
+        });
+        builder.setNeutralButton("New", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                AlertDialog.Builder newTagBuilder = new AlertDialog.Builder(BookAddedDetails.this);
+                newTagBuilder.setTitle("New Tag");
+                EditText input = new EditText(BookAddedDetails.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                newTagBuilder.setView(input);
+
+                newTagBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String tag = input.getText().toString();
+                        tagList.add(tag);
+                    }
+                });
+
+                newTagBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                AlertDialog newTagDialouge = newTagBuilder.create();
+                newTagDialouge.show();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

@@ -91,6 +91,7 @@ public class BookSearch extends AppCompatActivity {
                     String author = "";
                     String thumbnail = "";
                     for(int i=0;i<items.length();i++){
+                        ArrayList<String> tags = new ArrayList<>();
                         JSONObject itemsObj = items.getJSONObject(i);
                         JSONObject volumeObj = itemsObj.getJSONObject("volumeInfo");
                         JSONArray authors = volumeObj.getJSONArray("authors");
@@ -117,7 +118,7 @@ public class BookSearch extends AppCompatActivity {
                         else{
                             author = "No author found";
                         }
-                        BookItem book = new BookItem(author, publisher, published_date, title, description, thumbnail, info_link, id);
+                        BookItem book = new BookItem(author, publisher, published_date, title, description, thumbnail, info_link, id, tags);
                         searchResults.add(book);
 
                         BookAdapter myAdapter = new BookAdapter(searchResults, BookSearch.this, "BookSearch");

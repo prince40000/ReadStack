@@ -41,6 +41,7 @@ public class MainList extends AppCompatActivity{
     private BookStore bookStore, newBookStore, storedStore;
     private FloatingActionButton new_button, debug_button;
     public String author, publisher, published_date, title, desc, thumbnail_link, info_link, id, caller;
+    public ArrayList<String> tags;
     public Boolean choice = false;
     private static final String FILE_NAME="library.json";
     private FileOutputStream fos;
@@ -156,7 +157,8 @@ public class MainList extends AppCompatActivity{
         thumbnail_link = getIntent().getStringExtra("thumbnail_link");
         info_link = getIntent().getStringExtra("info_link");
         id = getIntent().getStringExtra("id");
-        BookItem book = new BookItem(author,publisher,published_date,title,desc,thumbnail_link,info_link, id);
+        tags = getIntent().getStringArrayListExtra("tags");
+        BookItem book = new BookItem(author,publisher,published_date,title,desc,thumbnail_link,info_link, id, tags);
         return book;
     }
 
