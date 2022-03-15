@@ -1,5 +1,7 @@
 package com.example.readstack;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -12,7 +14,7 @@ public class BookItem implements Serializable {
     String thumbnail_address;
     String info_link;
     String id;
-    ArrayList<String> tags;
+    ArrayList<String> tags = new ArrayList<>();
     public BookItem(String author_name, String publisher_name, String published_date, String book_title, String book_description, String thumbnail_address,String info_link, String id, ArrayList<String> tags){
         this.author_name = author_name;
         this.publisher_name = publisher_name;
@@ -47,6 +49,16 @@ public class BookItem implements Serializable {
         return info_link;
     }
     public String getId(){return id; }
+    public ArrayList<String> getTags(){return tags;}
+    public void addTags(ArrayList<String> input){
+        ArrayList<String> temp = new ArrayList<String>();
+        for(int i = 0; i<input.size(); i++){
+            String tag = input.get(i);
+            Log.d("Checker", tag);
+            temp.add(tag);
+        }
+        tags = temp;
+    }
     public String toString(){
         return "Book " + id + " [Title="
                 + book_title

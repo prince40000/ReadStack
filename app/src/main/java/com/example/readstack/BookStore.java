@@ -1,9 +1,8 @@
 package com.example.readstack;
-import android.util.Log;
 
 import java.util.ArrayList;
+
 public class BookStore{
-    int removeIndex;
     public ArrayList<BookItem> books;
     public BookStore(ArrayList<BookItem> bookDetails){
         books = new ArrayList<BookItem>();

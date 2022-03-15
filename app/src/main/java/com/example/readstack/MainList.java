@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,7 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class MainList extends AppCompatActivity{
-    private BookItem newBook, tempbook;
+    private BookItem newBook;
     private ArrayList<BookItem> bookDetails, printList;
     private BookStore bookStore, newBookStore, storedStore;
     private FloatingActionButton new_button, debug_button;
@@ -44,6 +46,7 @@ public class MainList extends AppCompatActivity{
     public ArrayList<String> tags;
     public Boolean choice = false;
     private static final String FILE_NAME="library.json";
+    public static final String TAG_FILE_NAME = "tag_list.json";
     private FileOutputStream fos;
     private Reader reader, exportReader, importReader;
     private File file;
@@ -85,9 +88,9 @@ public class MainList extends AppCompatActivity{
             catch (Exception e){
                 newBookStore = new BookStore();
                 newBookStore.addBook(newBook);
-                Log.d("CHECKTEST", String.valueOf(e));
+                //Log.d("CHECKTEST", String.valueOf(e));
             }
-            Log.d("TESTER", newBook.toString());
+            //Log.d("TESTER", newBook.toString());
 
             for(int i=0;i<newBookStore.length();i++){
                 printList.add(newBookStore.getBook(i));
@@ -142,6 +145,9 @@ public class MainList extends AppCompatActivity{
             case R.id.menu_clear:
                 clearAlert();
                 return true;
+            case R.id.menu_tags:
+                tagManagerAlert();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -161,12 +167,74 @@ public class MainList extends AppCompatActivity{
         BookItem book = new BookItem(author,publisher,published_date,title,desc,thumbnail_link,info_link, id, tags);
         return book;
     }
+    public void tagManagerAlert(){
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setTitle("Tags");
+        TagStore tagList;
+        ArrayList<String> removeTags = new ArrayList<>();
+        try{
+            File tagfile = new File(getFilesDir(), TAG_FILE_NAME);
+            Reader tagreader = new FileReader(tagfile.getAbsoluteFile());
+            tagList = gson.fromJson(tagreader, TagStore.class);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            tagList = new TagStore();
+        }
+        boolean[] checkedItems = new boolean[tagList.length()];
+        String[] tagDisplayArray = tagList.toArray();
+        builder.setMultiChoiceItems(tagDisplayArray, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                String toRemove = tagDisplayArray[which];
+                //Log.d("Checker", tagDisplayArray[which]);
+                if(removeTags.contains(tagDisplayArray[which])){
+                    removeTags.remove(tagDisplayArray[which]);
+                }
+                else {
+                    removeTags.add(toRemove);
+                    Log.d("Checker", removeTags.toString());
+                }
+            }
+        }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d("Checker", removeTags.toString());
+                File tagfile = new File(getFilesDir(), TAG_FILE_NAME);
+                Reader tagreader = null;
+                try {
+                    tagreader = new FileReader(tagfile.getAbsoluteFile());
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                TagStore tempTag = gson.fromJson(tagreader, TagStore.class);
+                for(int i = 0; i < removeTags.size(); i++){
+                    tempTag.removeTag(removeTags.get(i));
+                }
+                tagfile.delete();
+                try {
+                    fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
+                    fos.close();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+                writeToTagList(gson.toJson(tempTag));
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        androidx.appcompat.app.AlertDialog alert = builder.create();
+        alert.show();
+    }
 
     public void importAlert(){
         AlertDialog.Builder builder = new AlertDialog.Builder(MainList.this);
         builder.setMessage("This will override your current library");
 
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             public void onClick(DialogInterface dialog, int id) {
                 try{
                     File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), FILE_NAME);
@@ -205,6 +273,7 @@ public class MainList extends AppCompatActivity{
         builder.setMessage("This will override previous exports");
 
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             public void onClick(DialogInterface dialog, int id) {
                 try {
                     exportReader = new FileReader(file.getAbsoluteFile());
@@ -264,10 +333,6 @@ public class MainList extends AppCompatActivity{
         alert.show();
     }
 
-
-    public void setter(Boolean input){
-        choice = input;
-    }
     //WRITES JSON TO FILE_NAME
     public void writeToFile(String json, Context context){
         try {
@@ -279,6 +344,19 @@ public class MainList extends AppCompatActivity{
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
+
+    public void writeToTagList(String json){
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput(TAG_FILE_NAME, Context.MODE_APPEND));
+            outputStreamWriter.write(json);
+            outputStreamWriter.close();
+            Log.d("FileWriter", json);
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void writeToStorage(String json, Context context){
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {

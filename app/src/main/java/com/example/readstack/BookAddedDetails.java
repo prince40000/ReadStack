@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -32,7 +34,8 @@ import java.util.ArrayList;
 
 public class BookAddedDetails extends AppCompatActivity{
     String author, publisher, published_date, title, desc, thumbnail_link, info_link, id;
-    ArrayList<String> tagList = new ArrayList<>();
+    TagStore tagList;
+    ArrayList<String> bookTags;
     ArrayList<String> addTags = new ArrayList<>();
     BookItem book;
     TextView author_view, publisher_view, publish_date_view, title_view, description;
@@ -40,11 +43,12 @@ public class BookAddedDetails extends AppCompatActivity{
     ImageView thumbnail;
     Button remove_button, more_info_button, tag_button, favorite_button;
     static final String FILE_NAME= "library.json";
+    static final String TAG_FILE_NAME = "tag_list.json";
     BookStore bookStore;
-    Reader reader;
-    File file;
+    Reader reader, tagreader;
+    File file, tagfile;
     FileOutputStream fos;
-    Gson gson = new Gson();
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -61,6 +65,16 @@ public class BookAddedDetails extends AppCompatActivity{
         tag_button = findViewById(R.id.tag_button);
         favorite_button = findViewById(R.id.fav_button);
 
+        try {
+            //Opens file and reader, imports bookStore from JSON
+            file = new File(getFilesDir(), FILE_NAME);
+            reader = new FileReader(file.getAbsoluteFile());
+            bookStore = gson.fromJson(reader, BookStore.class);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         author = getIntent().getStringExtra("author");
         publisher = getIntent().getStringExtra("publisher");
         published_date = getIntent().getStringExtra("published_date");
@@ -69,7 +83,9 @@ public class BookAddedDetails extends AppCompatActivity{
         thumbnail_link = getIntent().getStringExtra("thumbnail_link");
         info_link = getIntent().getStringExtra("info_link");
         id = getIntent().getStringExtra("id");
-        book = (BookItem) getIntent().getSerializableExtra("book_item");
+        int index = bookStore.findIndex(id);
+        book = bookStore.getBook(index);
+        bookTags = book.getTags();
 
         author_view.setText(author);
         publisher_view.setText(publisher);
@@ -99,9 +115,9 @@ public class BookAddedDetails extends AppCompatActivity{
             public void onClick(View v) {
                 try {
                     //Opens file and reader, imports bookStore from JSON
-                    file = new File(getFilesDir(), FILE_NAME);
-                    reader = new FileReader(file.getAbsoluteFile());
-                    bookStore = gson.fromJson(reader, BookStore.class);
+                    //file = new File(getFilesDir(), FILE_NAME);
+                    //reader = new FileReader(file.getAbsoluteFile());
+                    //bookStore = gson.fromJson(reader, BookStore.class);
 
                     //Deletes existing JSON file, creates a new blank one
                     file.delete();
@@ -134,38 +150,77 @@ public class BookAddedDetails extends AppCompatActivity{
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
+    public void writeToTagList(String json){
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput(TAG_FILE_NAME, Context.MODE_APPEND));
+            outputStreamWriter.write(json);
+            outputStreamWriter.close();
+            Log.d("FileWriter", json);
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
 
     public void showTagList(){
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Tags");
 
+        try{
+            tagfile = new File(getFilesDir(), TAG_FILE_NAME);
+            tagreader = new FileReader(tagfile.getAbsoluteFile());
+            tagList = gson.fromJson(tagreader, TagStore.class);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            tagList = new TagStore();
+        }
+
         // add a checkbox list
-        boolean[] checkedItems = {false, false, false, false, false};
-        String[] tagDisplayArray = tagList.toArray(new String[0]);
+        boolean[] checkedItems = new boolean[tagList.length()];
+        try {
+            for (int i = 0; i < bookTags.size(); i++) {
+                int index = tagList.findIndex(bookTags.get(i));
+                checkedItems[index] = true;
+            }
+        }
+        catch (NullPointerException e){
+        }
+        catch (ArrayIndexOutOfBoundsException e){
+        }
+        String[] tagDisplayArray = tagList.toArray();
         builder.setMultiChoiceItems(tagDisplayArray, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-               String toAdd = tagDisplayArray[which];
-               addTags.add(toAdd);
-               try{
-                   for(int i = 0; i < addTags.size(); i++) {
-                       book.tags.add(addTags.get(i));
-                   }
-               }
-               catch (Exception e){
-
-               }
+                String toAdd = tagDisplayArray[which];
+                Log.d("Checker", tagDisplayArray[which]);
+                if(addTags.contains(tagDisplayArray[which])){
+                    addTags.remove(tagDisplayArray[which]);
+                }
+                else {
+                    addTags.add(toAdd);
+                    Log.d("Checker", addTags.toString());
+                }
+            }
+        }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d("Checker", addTags.toString());
+                book.addTags(addTags);
+                file.delete();
+                try {
+                    fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
+                    fos.close();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+                writeToFile(gson.toJson(bookStore));
             }
         });
 
         // add OK and Cancel buttons
-        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // user clicked OK
-            }
-        });
         builder.setNeutralButton("New", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -179,7 +234,20 @@ public class BookAddedDetails extends AppCompatActivity{
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String tag = input.getText().toString();
-                        tagList.add(tag);
+                        //Log.d("Tags", tag);
+                        tagList.addTag(tag);
+                        tagfile.delete();
+                        try {
+                            fos = openFileOutput(TAG_FILE_NAME, Context.MODE_APPEND);
+                            fos.close();
+                            writeToTagList(gson.toJson(tagList));
+                            tagreader = new FileReader(tagfile.getAbsoluteFile());
+                            tagList = gson.fromJson(tagreader, TagStore.class);
+                            //Log.d("Tag output", tagList.toString());
+                        }
+                        catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 });
 
@@ -189,10 +257,11 @@ public class BookAddedDetails extends AppCompatActivity{
 
                     }
                 });
-                AlertDialog newTagDialouge = newTagBuilder.create();
-                newTagDialouge.show();
+                AlertDialog newTagDialog = newTagBuilder.create();
+                newTagDialog.show();
             }
         });
+
         builder.setNegativeButton("Cancel", null);
 
         // create and show the alert dialog
