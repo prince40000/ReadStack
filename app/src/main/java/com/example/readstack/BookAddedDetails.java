@@ -87,7 +87,6 @@ public class BookAddedDetails extends AppCompatActivity{
         id = getIntent().getStringExtra("id");
         int index = bookStore.findIndex(id);
         book = bookStore.getBook(index);
-        bookTags = book.getTags();
 
         if(book.isFav()){
             favorite_button.setText("Unfavorite");
@@ -159,7 +158,6 @@ public class BookAddedDetails extends AppCompatActivity{
             }
         });
 
-        //Remove Button
         remove_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -211,12 +209,10 @@ public class BookAddedDetails extends AppCompatActivity{
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
-
     public void showTagList(){
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Tags");
-
         try{
             tagfile = new File(getFilesDir(), TAG_FILE_NAME);
             tagreader = new FileReader(tagfile.getAbsoluteFile());
@@ -230,6 +226,7 @@ public class BookAddedDetails extends AppCompatActivity{
         // add a checkbox list
         boolean[] checkedItems = new boolean[tagList.length()];
         try {
+            bookTags = book.getTags();
             for (int i = 0; i < bookTags.size(); i++) {
                 int index = tagList.findIndex(bookTags.get(i));
                 checkedItems[index] = true;
@@ -237,8 +234,10 @@ public class BookAddedDetails extends AppCompatActivity{
             }
         }
         catch (NullPointerException e){
+            e.printStackTrace();
         }
         catch (ArrayIndexOutOfBoundsException e){
+            e.printStackTrace();
         }
         String[] tagDisplayArray = tagList.toArray();
         //Displays checklist
@@ -246,12 +245,13 @@ public class BookAddedDetails extends AppCompatActivity{
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                 String toAdd = tagDisplayArray[which];
-                //Log.d("Checker", tagDisplayArray[which]);
                 if(addTags.contains(tagDisplayArray[which])){
                     addTags.remove(tagDisplayArray[which]);
+                    checkedItems[which] = false;
                 }
                 else {
                     addTags.add(toAdd);
+                    checkedItems[which] = true;
                 }
             }
             //Save changes to tags/applies tags
@@ -269,7 +269,6 @@ public class BookAddedDetails extends AppCompatActivity{
                     e.printStackTrace();
                 }
                 writeToFile(gson.toJson(bookStore));
-                recreate();
             }
         });
 
@@ -293,18 +292,23 @@ public class BookAddedDetails extends AppCompatActivity{
                             Toast.makeText(getBaseContext(), "Error tag already exists", Toast.LENGTH_SHORT).show();
                         }
                         else {
-                            tagList.addTag(tag);
-                            tagfile.delete();
-                            try {
-                                fos = openFileOutput(TAG_FILE_NAME, Context.MODE_APPEND);
-                                fos.close();
-                                writeToTagList(gson.toJson(tagList));
-                                tagreader = new FileReader(tagfile.getAbsoluteFile());
-                                tagList = gson.fromJson(tagreader, TagStore.class);
-                                //Log.d("Tag output", tagList.toString());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tagList.addTag(tag);
+                                    tagfile.delete();
+                                    try {
+                                        fos = openFileOutput(TAG_FILE_NAME, Context.MODE_APPEND);
+                                        fos.close();
+                                        writeToTagList(gson.toJson(tagList));
+                                        tagreader = new FileReader(tagfile.getAbsoluteFile());
+                                        tagList = gson.fromJson(tagreader, TagStore.class);
+                                        //Log.d("Tag output", tagList.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -316,6 +320,7 @@ public class BookAddedDetails extends AppCompatActivity{
                     }
                 });
                 AlertDialog newTagDialog = newTagBuilder.create();
+                newTagDialog.create();
                 newTagDialog.show();
             }
         });
@@ -324,6 +329,7 @@ public class BookAddedDetails extends AppCompatActivity{
 
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
+        dialog.create();
         dialog.show();
     }
     public boolean onKeyDown(int keyCode, KeyEvent event){
