@@ -1,6 +1,7 @@
 package com.example.readstack;
 
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.PopupMenu;
+import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -51,7 +53,7 @@ public class MainList extends AppCompatActivity{
     private Reader reader, exportReader, importReader;
     private File file;
     private Gson gson;
-    private BookGridAdapter gridAdapter;
+    private BookGridAdapter gridAdapter, filterGridAdapter;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,8 +132,56 @@ public class MainList extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
+        MenuItem search = menu.findItem(R.id.menu_search);
+        SearchView searchView = (SearchView) search.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                ArrayList<BookItem> filterList = new ArrayList<>();
+                Log.d("TagSearch", "Seraching for " + s);
+                if(!s.equals("")) {
+                    for (int i = 0; i < printList.size(); i++) {
+                        try {
+                            for (int c = 0; c < printList.get(i).getTags().size(); c++) {
+                                if (printList.get(i).getTags().get(c).equals(s)) {
+                                    filterList.add(printList.get(i));
+                                }
+                            }
+                        } catch (NullPointerException e) {
+                        }
+                    }
+                }
+                else{
+                    filterList = printList;
+                }
+                RecyclerView recyclerView = findViewById(R.id.library_list);
+                int numberOfColumns = 4;
+                recyclerView.setLayoutManager(new GridLayoutManager(MainList.this, numberOfColumns));
+                filterGridAdapter = new BookGridAdapter(MainList.this, filterList, "MainList");
+                recyclerView.setAdapter(filterGridAdapter);
+                //Log.d("Filter", "HERE");
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                RecyclerView recyclerView = findViewById(R.id.library_list);
+                int numberOfColumns = 4;
+                recyclerView.setLayoutManager(new GridLayoutManager(MainList.this, numberOfColumns));
+                gridAdapter = new BookGridAdapter(MainList.this, printList, "MainList");
+                recyclerView.setAdapter(gridAdapter);
+                return false;
+            }
+        });
         return(true);
     }
+
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case R.id.menu_import:

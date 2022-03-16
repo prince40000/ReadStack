@@ -183,6 +183,7 @@ public class BookAddedDetails extends AppCompatActivity{
             for (int i = 0; i < bookTags.size(); i++) {
                 int index = tagList.findIndex(bookTags.get(i));
                 checkedItems[index] = true;
+                addTags.add(bookTags.get(i));
             }
         }
         catch (NullPointerException e){
@@ -190,23 +191,24 @@ public class BookAddedDetails extends AppCompatActivity{
         catch (ArrayIndexOutOfBoundsException e){
         }
         String[] tagDisplayArray = tagList.toArray();
+        //Displays checklist
         builder.setMultiChoiceItems(tagDisplayArray, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                 String toAdd = tagDisplayArray[which];
-                Log.d("Checker", tagDisplayArray[which]);
+                //Log.d("Checker", tagDisplayArray[which]);
                 if(addTags.contains(tagDisplayArray[which])){
                     addTags.remove(tagDisplayArray[which]);
                 }
                 else {
                     addTags.add(toAdd);
-                    Log.d("Checker", addTags.toString());
                 }
             }
+            //Save changes to tags/applies tags
         }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.d("Checker", addTags.toString());
+                //Log.d("Checker", addTags.toString());
                 book.addTags(addTags);
                 file.delete();
                 try {
@@ -217,19 +219,21 @@ public class BookAddedDetails extends AppCompatActivity{
                     e.printStackTrace();
                 }
                 writeToFile(gson.toJson(bookStore));
+                recreate();
             }
         });
 
-        // add OK and Cancel buttons
+        //New Tag Button
         builder.setNeutralButton("New", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                //Displays tag creation dialogue
                 AlertDialog.Builder newTagBuilder = new AlertDialog.Builder(BookAddedDetails.this);
                 newTagBuilder.setTitle("New Tag");
                 EditText input = new EditText(BookAddedDetails.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 newTagBuilder.setView(input);
-
+                //Adds new tag to master list
                 newTagBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -250,7 +254,7 @@ public class BookAddedDetails extends AppCompatActivity{
                         }
                     }
                 });
-
+                //Cancels adding new tag
                 newTagBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -261,7 +265,7 @@ public class BookAddedDetails extends AppCompatActivity{
                 newTagDialog.show();
             }
         });
-
+        //Cancels adding any tags
         builder.setNegativeButton("Cancel", null);
 
         // create and show the alert dialog
