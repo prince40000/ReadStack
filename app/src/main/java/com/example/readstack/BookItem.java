@@ -15,7 +15,8 @@ public class BookItem implements Serializable {
     String info_link;
     String id;
     ArrayList<String> tags = new ArrayList<>();
-    public BookItem(String author_name, String publisher_name, String published_date, String book_title, String book_description, String thumbnail_address,String info_link, String id, ArrayList<String> tags){
+    Boolean favorite;
+    public BookItem(String author_name, String publisher_name, String published_date, String book_title, String book_description, String thumbnail_address,String info_link, String id, ArrayList<String> tags, Boolean favorite){
         this.author_name = author_name;
         this.publisher_name = publisher_name;
         this.published_date = published_date;
@@ -25,6 +26,8 @@ public class BookItem implements Serializable {
         this.info_link = info_link;
         this.id = id;
         this.tags = tags;
+        this.favorite = favorite;
+
     }
 
     public String getAuthor_name(){
@@ -52,12 +55,32 @@ public class BookItem implements Serializable {
     public ArrayList<String> getTags(){return tags;}
     public void addTags(ArrayList<String> input){
         ArrayList<String> temp = new ArrayList<String>();
+        ArrayList<String> setter = new ArrayList<>();
         for(int i = 0; i<input.size(); i++){
             String tag = input.get(i);
-            Log.d("Checker", tag);
+            //Log.d("Checker", tag);
             temp.add(tag);
         }
+        for(int c = 0; c<temp.size();c++){
+            if(setter.contains(temp.get(c))){
+            }
+            else{
+                setter.add(temp.get(c));
+            }
+        }
         tags = temp;
+    }
+    public Boolean isFav(){
+        if(favorite){
+            return(true);
+        }
+        else{
+            return(false);
+        }
+    }
+
+    public void setFav(Boolean set){
+        favorite = set;
     }
     public String toString(){
         return "Book " + id + " [Title="

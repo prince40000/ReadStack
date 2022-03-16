@@ -8,12 +8,14 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -87,6 +89,10 @@ public class BookAddedDetails extends AppCompatActivity{
         book = bookStore.getBook(index);
         bookTags = book.getTags();
 
+        if(book.isFav()){
+            favorite_button.setText("Unfavorite");
+        }
+
         author_view.setText(author);
         publisher_view.setText(publisher);
         publish_date_view.setText(published_date);
@@ -94,10 +100,54 @@ public class BookAddedDetails extends AppCompatActivity{
         title_view.setText(title);
         Picasso.get().load(thumbnail_link).into(thumbnail);
 
+        ArrayList<String> currentTags = book.getTags();
+        try {
+            if (currentTags.contains("Favorite")) {
+                favorite_button.setText("Unfavorite");
+            }
+        }
+        catch (NullPointerException e){
+        }
         tag_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showTagList();
+            }
+        });
+
+        favorite_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!book.isFav()){
+                    book.setFav(true);
+                    favorite_button.setText("Unfavorite");
+
+                    try {
+                        file.delete();
+                        fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
+                        fos.close();
+                        writeToFile(gson.toJson(bookStore));
+                        reader.close();
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    book.setFav(false);
+                    favorite_button.setText("Favorite");
+
+                    try {
+                        file.delete();
+                        fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
+                        fos.close();
+                        writeToFile(gson.toJson(bookStore));
+                        reader.close();
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -239,18 +289,22 @@ public class BookAddedDetails extends AppCompatActivity{
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String tag = input.getText().toString();
                         //Log.d("Tags", tag);
-                        tagList.addTag(tag);
-                        tagfile.delete();
-                        try {
-                            fos = openFileOutput(TAG_FILE_NAME, Context.MODE_APPEND);
-                            fos.close();
-                            writeToTagList(gson.toJson(tagList));
-                            tagreader = new FileReader(tagfile.getAbsoluteFile());
-                            tagList = gson.fromJson(tagreader, TagStore.class);
-                            //Log.d("Tag output", tagList.toString());
+                        if(tagList.contains(tag)){
+                            Toast.makeText(getBaseContext(), "Error tag already exists", Toast.LENGTH_SHORT).show();
                         }
-                        catch (Exception e){
-                            e.printStackTrace();
+                        else {
+                            tagList.addTag(tag);
+                            tagfile.delete();
+                            try {
+                                fos = openFileOutput(TAG_FILE_NAME, Context.MODE_APPEND);
+                                fos.close();
+                                writeToTagList(gson.toJson(tagList));
+                                tagreader = new FileReader(tagfile.getAbsoluteFile());
+                                tagList = gson.fromJson(tagreader, TagStore.class);
+                                //Log.d("Tag output", tagList.toString());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
@@ -271,5 +325,16 @@ public class BookAddedDetails extends AppCompatActivity{
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        switch(keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                Intent i = new Intent(BookAddedDetails.this, MainList.class);
+                i.putExtra("calling_class", "BookAddedDetails");
+                //i.putExtra("title", title);
+                BookAddedDetails.this.startActivity(i);
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
     }
 }

@@ -23,7 +23,14 @@ public class TagStore{
     public int length(){
         return tags.size();
     }
-
+    public boolean contains(String s){
+        if(tags.contains(s)){
+            return(true);
+        }
+        else{
+            return(false);
+        }
+    }
     public String toString(){
         String output = "";
         for(int i = 0; i < tags.size(); i++)

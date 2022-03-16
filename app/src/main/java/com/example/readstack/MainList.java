@@ -23,6 +23,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
@@ -41,12 +42,13 @@ import java.util.ArrayList;
 
 public class MainList extends AppCompatActivity{
     private BookItem newBook;
-    private ArrayList<BookItem> bookDetails, printList;
+    private ArrayList<BookItem> bookDetails, printList, favList;
     private BookStore bookStore, newBookStore, storedStore;
     private FloatingActionButton new_button, debug_button;
     public String author, publisher, published_date, title, desc, thumbnail_link, info_link, id, caller;
     public ArrayList<String> tags;
     public Boolean choice = false;
+    public Boolean favorite;
     private static final String FILE_NAME="library.json";
     public static final String TAG_FILE_NAME = "tag_list.json";
     private FileOutputStream fos;
@@ -126,6 +128,24 @@ public class MainList extends AppCompatActivity{
             recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
             gridAdapter = new BookGridAdapter(this, printList, "MainList");
             recyclerView.setAdapter(gridAdapter);
+        }
+        favList = new ArrayList<>();
+        try {
+            for (int i = 0; i < bookStore.length(); i++) {
+                if (bookStore.getBook(i).isFav()) {
+                    favList.add(bookStore.getBook(i));
+                }
+            }
+            if (favList.size() > 0) {
+                LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+                RecyclerView favView = (RecyclerView) findViewById(R.id.favorite_list);
+                favView.setLayoutManager(layoutManager);
+                FavoriteAdapter favAdapter = new FavoriteAdapter(favList, this, "MainList");
+                favView.setAdapter(favAdapter);
+                favView.setVisibility(View.VISIBLE);
+            }
+        }
+        catch (NullPointerException e){
         }
     }
 
@@ -214,7 +234,8 @@ public class MainList extends AppCompatActivity{
         info_link = getIntent().getStringExtra("info_link");
         id = getIntent().getStringExtra("id");
         tags = getIntent().getStringArrayListExtra("tags");
-        BookItem book = new BookItem(author,publisher,published_date,title,desc,thumbnail_link,info_link, id, tags);
+        favorite = false;
+        BookItem book = new BookItem(author,publisher,published_date,title,desc,thumbnail_link,info_link, id, tags, favorite);
         return book;
     }
     public void tagManagerAlert(){
