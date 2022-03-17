@@ -16,6 +16,9 @@ public class BookItem implements Serializable {
     String id;
     ArrayList<String> tags = new ArrayList<>();
     Boolean favorite;
+    int status;
+    int raiting = 0;
+    String notes = "Notes";
     public BookItem(String author_name, String publisher_name, String published_date, String book_title, String book_description, String thumbnail_address,String info_link, String id, ArrayList<String> tags, Boolean favorite){
         this.author_name = author_name;
         this.publisher_name = publisher_name;
@@ -29,7 +32,12 @@ public class BookItem implements Serializable {
         this.favorite = favorite;
 
     }
-
+    public int getStatus(){return(status);}
+    public void setStatus(int s){status = s;}
+    public int getRaiting(){return(raiting);}
+    public void setRaitng(int s){raiting = s;}
+    public String getNotes(){return(notes);}
+    public void setNotes(String s){notes = s;}
     public String getAuthor_name(){
         return author_name;
     }
@@ -78,7 +86,6 @@ public class BookItem implements Serializable {
             return(false);
         }
     }
-
     public void setFav(Boolean set){
         favorite = set;
     }

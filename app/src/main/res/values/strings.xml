@@ -1,8 +1,16 @@
 <resources>
     <string name="app_name">ReadStack</string>
+    <string name="book_thumbnail">Book Thumbnail</string>
     <string-array name="search_spinner_array">
         <item>Title</item>
         <item>Author</item>
         <item>ISBN</item>
+    </string-array>
+
+    <string-array name="status_spinner_array">
+        <item>In progress</item>
+        <item>Complete</item>
+        <item>Purchased</item>
+        <item>Dropped</item>
     </string-array>
 </resources>

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/raiting_bar"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/bookAddedDetailsLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -15,18 +16,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1.45"
+            android:layout_height="5dp" />
+
+        <LinearLayout
+            android:id="@+id/bookAddedDetailsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
+
+            <Space
+                android:layout_width="5dp"
+                android:layout_height="wrap_content" />
 
             <ImageView
                 android:id="@+id/thumbnail_view_add_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight=".4"
-                android:scaleType="centerCrop"
+                android:layout_width="175dp"
+                android:layout_height="250dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/book_thumbnail"
+                android:hapticFeedbackEnabled="false"
+                android:scaleType="fitXY"
                 app:srcCompat="@drawable/content" />
 
             <Space
@@ -41,65 +52,119 @@
 
                 <TextView
                     android:id="@+id/title_text"
+                    style="@style/Widget.MaterialComponents.TextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight=".2"
-                    android:autoSizeTextType="uniform"
                     android:autoSizeMaxTextSize="25dp"
                     android:autoSizeMinTextSize="12dp"
+                    android:autoSizeTextType="uniform"
                     android:text="title_text" />
 
                 <TextView
                     android:id="@+id/author_text"
+                    style="@style/Widget.MaterialComponents.TextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight=".2"
-                    android:autoSizeTextType="uniform"
                     android:autoSizeMaxTextSize="25dp"
                     android:autoSizeMinTextSize="12dp"
+                    android:autoSizeTextType="uniform"
                     android:text="author_text" />
 
                 <TextView
                     android:id="@+id/publisher_text"
+                    style="@style/Widget.MaterialComponents.TextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight=".2"
-                    android:autoSizeTextType="uniform"
                     android:autoSizeMaxTextSize="25dp"
                     android:autoSizeMinTextSize="12dp"
+                    android:autoSizeTextType="uniform"
                     android:text="publisher_text" />
 
                 <TextView
                     android:id="@+id/publish_date_text"
+                    style="@style/Widget.MaterialComponents.TextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight=".2"
-                    android:autoSizeTextType="uniform"
                     android:autoSizeMaxTextSize="25dp"
                     android:autoSizeMinTextSize="12dp"
+                    android:autoSizeTextType="uniform"
                     android:text="publish_date_text" />
 
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".2"
+                    android:max="10"
+                    android:progress="5"
+                    android:visibility="gone" />
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+
+                    style="@style/Widget.AppCompat.RatingBar.Indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="left"
+                    android:layout_weight=".2"
+                    android:numStars="5"
+                    android:scaleX=".8"
+                    android:scaleY=".8"
+                    android:stepSize=".5"
+                    android:visibility="gone"
+                    tools:ignore="SpeakableTextPresentCheck" />
+
+                <Spinner
+                    android:id="@+id/status_spinner"
+                    style="@style/Widget.MaterialComponents.TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".2"
+                    android:autoSizeMaxTextSize="25dp"
+                    android:autoSizeMinTextSize="12dp"
+                    android:autoSizeTextType="uniform"
+                    android:dropDownWidth="match_parent"
+                    tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
             </LinearLayout>
+
+            <Space
+                android:layout_width="5dp"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/bookAddedDetailsBody"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
             android:layout_weight=".65"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="10dp"
+            android:windowSoftInputMode="stateHidden">
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="5dp" />
+                android:layout_height="5dp"
+                android:background="#000000" />
 
             <TextView
-                android:scrollbars = "vertical"
-                android:maxHeight="100dp"
                 android:id="@+id/description_text"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight=".75"
-                android:text="description_text" />
+                android:layout_height="wrap_content"
+                android:layout_weight=".25"
+                android:maxHeight="100dp"
+                android:minLines="7"
+                android:scrollbars="vertical"
+                android:text="description_text"
+                android:windowSoftInputMode="stateHidden" />
 
             <Space
                 android:layout_width="match_parent"
@@ -109,18 +174,20 @@
                 android:id="@+id/comments_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight=".5"
-                android:ems="10"
+                android:layout_weight=".75"
+                android:gravity="top|left"
                 android:inputType="textPersonName"
                 android:maxHeight="450dp"
                 android:scrollbars="vertical"
-                android:text="comments_text" />
+                android:text="Notes"
+                android:textAlignment="textStart" />
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="5dp" />
 
             <LinearLayout
+                android:id="@+id/bookAddedDetailsFooter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"

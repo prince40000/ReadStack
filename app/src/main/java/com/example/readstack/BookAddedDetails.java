@@ -3,17 +3,19 @@ package com.example.readstack;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,10 +27,8 @@ import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -43,6 +43,7 @@ public class BookAddedDetails extends AppCompatActivity{
     TextView author_view, publisher_view, publish_date_view, title_view, description;
     EditText comments;
     ImageView thumbnail;
+    Spinner status_spinner;
     Button remove_button, more_info_button, tag_button, favorite_button;
     static final String FILE_NAME= "library.json";
     static final String TAG_FILE_NAME = "tag_list.json";
@@ -51,10 +52,12 @@ public class BookAddedDetails extends AppCompatActivity{
     File file, tagfile;
     FileOutputStream fos;
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    boolean isKeyboardShowing = false;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_added_details2);
+        getSupportActionBar().hide();
         author_view = findViewById(R.id.author_text);
         publisher_view = findViewById(R.id.publisher_text);
         publish_date_view = findViewById(R.id.publish_date_text);
@@ -66,6 +69,19 @@ public class BookAddedDetails extends AppCompatActivity{
         comments = findViewById(R.id.comments_text);
         tag_button = findViewById(R.id.tag_button);
         favorite_button = findViewById(R.id.fav_button);
+        View footer = findViewById(R.id.bookAddedDetailsFooter);
+        status_spinner = findViewById(R.id.status_spinner);
+        String[] statusList = new String[5];
+        statusList[0]=("Want to read");
+        statusList[1]=("Purchased");
+        statusList[2]=("In progress");
+        statusList[3]=("Complete");
+        statusList[4]=("Dropped");
+        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.status_spinner, statusList);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_spinner_array, R.layout.status_spinner);
+        adapter.setDropDownViewResource(R.layout.status_spinner_dropdown);
+        status_spinner.setPrompt("Status");
+        status_spinner.setAdapter(new CustomSpinnerAdapter(adapter, R.layout.status_spinner_default, this));
 
         try {
             //Opens file and reader, imports bookStore from JSON
@@ -87,7 +103,14 @@ public class BookAddedDetails extends AppCompatActivity{
         id = getIntent().getStringExtra("id");
         int index = bookStore.findIndex(id);
         book = bookStore.getBook(index);
-
+        try {
+            status_spinner.setSelection(book.getStatus());
+        }
+        catch (NullPointerException e){
+            status_spinner.setSelection(0);
+            statusList[0]="Status";
+        }
+        comments.setText(book.getNotes());
         if(book.isFav()){
             favorite_button.setText("Unfavorite");
         }
@@ -187,6 +210,44 @@ public class BookAddedDetails extends AppCompatActivity{
                 }
             }
         });
+
+        View mainLayout = findViewById(R.id.bookAddedDetailsLayout);
+        mainLayout.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        Rect r = new Rect();
+                        mainLayout.getWindowVisibleDisplayFrame(r);
+                        int screenHeight = mainLayout.getRootView().getHeight();
+                        int keypadHeight = screenHeight - r.bottom;
+                        if (keypadHeight > screenHeight * 0.15) {
+                            // keyboard is opened
+                            if (!isKeyboardShowing) {
+                                isKeyboardShowing = true;
+                                onKeyboardVisibilityChanged(true);
+                            }
+                        }
+                        else {
+                            // keyboard is closed
+                            if (isKeyboardShowing) {
+                                isKeyboardShowing = false;
+                                onKeyboardVisibilityChanged(false);
+                            }
+                        }
+                    }
+                });
+    }
+
+    void onKeyboardVisibilityChanged(boolean opened) {
+        View footer = findViewById(R.id.bookAddedDetailsFooter);
+        if(opened){
+            footer.setVisibility(View.GONE);
+            description.setVisibility(View.GONE);
+        }
+        else{
+            footer.setVisibility(View.VISIBLE);
+            description.setVisibility(View.VISIBLE);
+        }
     }
     public void writeToFile(String json){
         try {
@@ -258,7 +319,6 @@ public class BookAddedDetails extends AppCompatActivity{
         }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //Log.d("Checker", addTags.toString());
                 book.addTags(addTags);
                 file.delete();
                 try {
@@ -303,7 +363,6 @@ public class BookAddedDetails extends AppCompatActivity{
                                         writeToTagList(gson.toJson(tagList));
                                         tagreader = new FileReader(tagfile.getAbsoluteFile());
                                         tagList = gson.fromJson(tagreader, TagStore.class);
-                                        //Log.d("Tag output", tagList.toString());
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -337,7 +396,17 @@ public class BookAddedDetails extends AppCompatActivity{
             case KeyEvent.KEYCODE_BACK:
                 Intent i = new Intent(BookAddedDetails.this, MainList.class);
                 i.putExtra("calling_class", "BookAddedDetails");
-                //i.putExtra("title", title);
+                book.setNotes(comments.getText().toString());
+                book.setStatus(status_spinner.getSelectedItemPosition());
+                file.delete();
+                try {
+                    fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
+                    fos.close();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+                writeToFile(gson.toJson(bookStore));
                 BookAddedDetails.this.startActivity(i);
             default:
                 return super.onKeyUp(keyCode, event);

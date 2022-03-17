@@ -10,7 +10,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/readstack_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ReadStack">
+        android:theme="@style/Theme.ReadStack"
+        android:windowSoftInputMode="adjustResize">
         <activity android:name=".BookAddedDetails"></activity>
         <activity android:name=".BookSearch"></activity>
         <activity android:name=".AddBook"></activity>
