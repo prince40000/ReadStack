@@ -7,14 +7,21 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RatingBar;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,10 +47,13 @@ public class BookAddedDetails extends AppCompatActivity{
     ArrayList<String> bookTags;
     ArrayList<String> addTags = new ArrayList<>();
     BookItem book;
-    TextView author_view, publisher_view, publish_date_view, title_view, description;
+    TextView author_view, publisher_view, publish_date_view, title_view, description, progressText;
     EditText comments;
     ImageView thumbnail;
     Spinner status_spinner;
+    RatingBar rating;
+    SeekBar progress;
+    LinearLayout footer, progressBarLayout;
     Button remove_button, more_info_button, tag_button, favorite_button;
     static final String FILE_NAME= "library.json";
     static final String TAG_FILE_NAME = "tag_list.json";
@@ -66,23 +76,68 @@ public class BookAddedDetails extends AppCompatActivity{
         remove_button = findViewById(R.id.remove_button);
         more_info_button = findViewById(R.id.more_info_button_add);
         description = findViewById(R.id.description_text);
+        description.setMovementMethod(new ScrollingMovementMethod());
         comments = findViewById(R.id.comments_text);
         tag_button = findViewById(R.id.tag_button);
         favorite_button = findViewById(R.id.fav_button);
-        View footer = findViewById(R.id.bookAddedDetailsFooter);
+        footer = findViewById(R.id.bookAddedDetailsFooter);
         status_spinner = findViewById(R.id.status_spinner);
-        String[] statusList = new String[5];
-        statusList[0]=("Want to read");
-        statusList[1]=("Purchased");
-        statusList[2]=("In progress");
-        statusList[3]=("Complete");
-        statusList[4]=("Dropped");
-        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.status_spinner, statusList);
+        rating = findViewById(R.id.ratingBar);
+        progress = findViewById(R.id.progressBar);
+        progressText = findViewById(R.id.progressText);
+        progressBarLayout = findViewById(R.id.progressBarLayout);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_spinner_array, R.layout.status_spinner);
         adapter.setDropDownViewResource(R.layout.status_spinner_dropdown);
         status_spinner.setPrompt("Status");
         status_spinner.setAdapter(new CustomSpinnerAdapter(adapter, R.layout.status_spinner_default, this));
+        status_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i == 4) {
+                    progressBarLayout.setVisibility(View.GONE);
+                    rating.setVisibility(View.VISIBLE);
+                    try {
+                        rating.setRating(book.getRaiting());
+                    }
+                    catch (NullPointerException e){
+                    }
+                }
+                if (i == 3 || i ==5) {
+                    rating.setVisibility(View.GONE);
+                    progressBarLayout.setVisibility(View.VISIBLE);
+                }
+                if(i == 1 || i == 2){
+                    progressBarLayout.setVisibility(View.GONE);
+                    rating.setVisibility(View.GONE);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                progressBarLayout.setVisibility(View.GONE);
+                rating.setVisibility(View.GONE);
+            }
+        });
 
+        progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                int progressPrint = 5*(Math.round(progress.getProgress()/5));
+                progressText.setText(progressPrint + "%");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progressPrint = 5*(Math.round(progress.getProgress()/5));
+                progressText.setText(progressPrint + "%");
+                saveChanges();
+            }
+        });
         try {
             //Opens file and reader, imports bookStore from JSON
             file = new File(getFilesDir(), FILE_NAME);
@@ -105,10 +160,10 @@ public class BookAddedDetails extends AppCompatActivity{
         book = bookStore.getBook(index);
         try {
             status_spinner.setSelection(book.getStatus());
+            progress.setProgress(book.getProgress());
         }
         catch (NullPointerException e){
-            status_spinner.setSelection(0);
-            statusList[0]="Status";
+
         }
         comments.setText(book.getNotes());
         if(book.isFav()){
@@ -128,8 +183,7 @@ public class BookAddedDetails extends AppCompatActivity{
                 favorite_button.setText("Unfavorite");
             }
         }
-        catch (NullPointerException e){
-        }
+        catch (NullPointerException e){}
         tag_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -237,7 +291,21 @@ public class BookAddedDetails extends AppCompatActivity{
                     }
                 });
     }
-
+    public void saveChanges(){
+        book.setNotes(comments.getText().toString());
+        book.setStatus(status_spinner.getSelectedItemPosition());
+        book.setProgress(progress.getProgress());
+        book.setRaitng(rating.getRating());
+        file.delete();
+        try {
+            fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
+            fos.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        writeToFile(gson.toJson(bookStore));
+    }
     void onKeyboardVisibilityChanged(boolean opened) {
         View footer = findViewById(R.id.bookAddedDetailsFooter);
         if(opened){
@@ -247,6 +315,7 @@ public class BookAddedDetails extends AppCompatActivity{
         else{
             footer.setVisibility(View.VISIBLE);
             description.setVisibility(View.VISIBLE);
+            saveChanges();
         }
     }
     public void writeToFile(String json){
@@ -288,10 +357,10 @@ public class BookAddedDetails extends AppCompatActivity{
         boolean[] checkedItems = new boolean[tagList.length()];
         try {
             bookTags = book.getTags();
+            book.clearTags();
             for (int i = 0; i < bookTags.size(); i++) {
                 int index = tagList.findIndex(bookTags.get(i));
                 checkedItems[index] = true;
-                addTags.add(bookTags.get(i));
             }
         }
         catch (NullPointerException e){
@@ -319,7 +388,24 @@ public class BookAddedDetails extends AppCompatActivity{
         }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                book.addTags(addTags);
+                for(int i=0; i<addTags.size(); i++){
+                    try {
+                        if (bookTags.contains(addTags.get(i))) {
+                        } else {
+                            book.addTag(addTags.get(i));
+                        }
+                    }
+                    catch (NullPointerException e){
+                        book.addTag(addTags.get(i));
+                    }
+                }
+                try {
+                    for (int c = 0; c < bookTags.size(); c++) {
+                        addTags.add(bookTags.get(c));
+                    }
+                }
+                catch (NullPointerException e){
+                }
                 file.delete();
                 try {
                     fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
@@ -396,17 +482,7 @@ public class BookAddedDetails extends AppCompatActivity{
             case KeyEvent.KEYCODE_BACK:
                 Intent i = new Intent(BookAddedDetails.this, MainList.class);
                 i.putExtra("calling_class", "BookAddedDetails");
-                book.setNotes(comments.getText().toString());
-                book.setStatus(status_spinner.getSelectedItemPosition());
-                file.delete();
-                try {
-                    fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
-                    fos.close();
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
-                writeToFile(gson.toJson(bookStore));
+                saveChanges();
                 BookAddedDetails.this.startActivity(i);
             default:
                 return super.onKeyUp(keyCode, event);

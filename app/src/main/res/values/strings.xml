@@ -8,9 +8,10 @@
     </string-array>
 
     <string-array name="status_spinner_array">
+        <item>Want to read</item>
+        <item>Purchased</item>
         <item>In progress</item>
         <item>Complete</item>
-        <item>Purchased</item>
         <item>Dropped</item>
     </string-array>
 </resources>

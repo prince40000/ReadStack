@@ -17,7 +17,8 @@ public class BookItem implements Serializable {
     ArrayList<String> tags = new ArrayList<>();
     Boolean favorite;
     int status;
-    int raiting = 0;
+    float rating = 0;
+    int progress = 0;
     String notes = "Notes";
     public BookItem(String author_name, String publisher_name, String published_date, String book_title, String book_description, String thumbnail_address,String info_link, String id, ArrayList<String> tags, Boolean favorite){
         this.author_name = author_name;
@@ -34,8 +35,10 @@ public class BookItem implements Serializable {
     }
     public int getStatus(){return(status);}
     public void setStatus(int s){status = s;}
-    public int getRaiting(){return(raiting);}
-    public void setRaitng(int s){raiting = s;}
+    public void setProgress(int i){progress = i;}
+    public int getProgress(){return(progress);}
+    public float getRaiting(){return(rating);}
+    public void setRaitng(float s){rating = s;}
     public String getNotes(){return(notes);}
     public void setNotes(String s){notes = s;}
     public String getAuthor_name(){
@@ -61,23 +64,8 @@ public class BookItem implements Serializable {
     }
     public String getId(){return id; }
     public ArrayList<String> getTags(){return tags;}
-    public void addTags(ArrayList<String> input){
-        ArrayList<String> temp = new ArrayList<String>();
-        ArrayList<String> setter = new ArrayList<>();
-        for(int i = 0; i<input.size(); i++){
-            String tag = input.get(i);
-            //Log.d("Checker", tag);
-            temp.add(tag);
-        }
-        for(int c = 0; c<temp.size();c++){
-            if(setter.contains(temp.get(c))){
-            }
-            else{
-                setter.add(temp.get(c));
-            }
-        }
-        tags = temp;
-    }
+    public void addTag(String input){ tags.add(input); }
+    public void clearTags(){ tags = new ArrayList<>();}
     public Boolean isFav(){
         if(favorite){
             return(true);

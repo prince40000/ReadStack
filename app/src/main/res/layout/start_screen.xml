@@ -10,10 +10,10 @@
         android:id="@+id/logo_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@drawable/ic_readstack"
+        app:srcCompat="@drawable/ic_readstack_welcome_screen"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="0dp"
-        tools:srcCompat="@drawable/ic_readstack" />
+        tools:srcCompat="@drawable/ic_readstack_welcome_screen" />
 
     <Button
         android:id="@+id/enter_button"
