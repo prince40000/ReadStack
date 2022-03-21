@@ -1,4 +1,4 @@
-package com.example.readstack;
+package com.prince.readstack;
 
 import org.junit.Test;
 

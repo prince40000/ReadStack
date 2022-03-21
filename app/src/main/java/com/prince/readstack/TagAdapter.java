@@ -1,4 +1,4 @@
-package com.example.readstack;
+package com.prince.readstack;
 
 import android.content.Context;
 import android.view.LayoutInflater;

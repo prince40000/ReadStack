@@ -1,42 +1,47 @@
-package com.example.readstack;
+package com.prince.readstack;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-
 import com.squareup.picasso.Picasso;
 
-public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyViewHolder> {
-    ArrayList<BookItem> bookItemList;
-    Context myContext;
-    String whoCalled;
-    ItemClickListener mClickListener;
-    public FavoriteAdapter (ArrayList bookItemList, Context myContext, String caller) {
-        this.bookItemList = bookItemList;
-        this.myContext = myContext;
+import java.util.ArrayList;
+
+public class BookGridAdapter extends RecyclerView.Adapter<BookGridAdapter.ViewHolder> {
+
+    private ArrayList<BookItem> bookItemList;
+    private LayoutInflater mInflater;
+    private ItemClickListener mClickListener;
+    private String whoCalled;
+    private Context myContext;
+
+    // data is passed into the constructor
+    BookGridAdapter(Context context, ArrayList<BookItem> data, String caller) {
+        this.mInflater = LayoutInflater.from(context);
+        this.bookItemList = data;
+        this.myContext = context;
         this.whoCalled = caller;
     }
 
-    @NonNull
+    // inflates the cell layout from xml when needed
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout, parent, false);
-        return new MyViewHolder(view);
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.item_layout, parent, false);
+        return new ViewHolder(view);
     }
 
+    // binds the data to the TextView in each cell
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         BookItem bookItem = bookItemList.get(position);
         Picasso.get().load(bookItemList.get(position).getThumbnail_address()).into(holder.myImageView);
 
@@ -75,21 +80,18 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         });
     }
 
-
+    // total number of cells
     @Override
     public int getItemCount() {
-        try {
-            return bookItemList.size();
-        }
-        catch (Exception e){
-            return 0;
-        }
+        return bookItemList.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    // stores and recycles views as they are scrolled off screen
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView myImageView;
 
-        MyViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             myImageView = itemView.findViewById(R.id.mainListItem);
             itemView.setOnClickListener(this);
@@ -107,8 +109,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     }
 
     // allows clicks events to be caught
-    void setClickListener(BookGridAdapter.ItemClickListener itemClickListener) {
-        this.mClickListener = (ItemClickListener) itemClickListener;
+    void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
     }
 
     // parent activity will implement this method to respond to click events
@@ -116,3 +118,4 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         void onItemClick(View view, int position);
     }
 }
+

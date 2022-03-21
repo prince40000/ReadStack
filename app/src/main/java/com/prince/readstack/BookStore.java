@@ -1,4 +1,4 @@
-package com.example.readstack;
+package com.prince.readstack;
 
 import java.util.ArrayList;
 

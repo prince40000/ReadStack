@@ -1,4 +1,4 @@
-package com.example.readstack;
+package com.prince.readstack;
 
 import android.app.AlertDialog;
 import android.app.SearchManager;
@@ -25,9 +25,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.prince.readstack.BookStore;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.prince.readstack.BookGridAdapter;
+import com.prince.readstack.BookItem;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -464,6 +469,7 @@ public class MainList extends AppCompatActivity{
                 MainList.this.startActivity(i);
             }
         });
+        /*
         debug_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
@@ -489,5 +495,6 @@ public class MainList extends AppCompatActivity{
                 }
             }
         });
+         */
     }
 }

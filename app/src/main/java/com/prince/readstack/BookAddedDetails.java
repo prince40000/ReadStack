@@ -1,10 +1,11 @@
-package com.example.readstack;
+package com.prince.readstack;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
@@ -26,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -339,6 +341,7 @@ public class BookAddedDetails extends AppCompatActivity{
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void showTagList(){
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -420,6 +423,7 @@ public class BookAddedDetails extends AppCompatActivity{
 
         //New Tag Button
         builder.setNeutralButton("New", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Displays tag creation dialogue
