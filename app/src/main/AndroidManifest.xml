@@ -12,11 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ReadStack"
         android:windowSoftInputMode="adjustResize">
-        <activity android:name=".BookAddedDetails"></activity>
-        <activity android:name=".BookSearch"></activity>
-        <activity android:name=".AddBook"></activity>
-        <activity android:name=".MainList"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name="com.prince.readstack.BookAddedDetails"></activity>
+        <activity android:name="com.prince.readstack.BookSearch"></activity>
+        <activity android:name="com.prince.readstack.AddBook"></activity>
+        <activity android:name="com.prince.readstack.MainList"></activity>
+        <activity android:name="com.prince.readstack.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

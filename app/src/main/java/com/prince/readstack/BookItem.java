@@ -1,7 +1,5 @@
 package com.prince.readstack;
 
-import android.util.Log;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -20,6 +18,7 @@ public class BookItem implements Serializable {
     float rating = 0;
     int progress = 0;
     String notes = "Notes";
+
     public BookItem(String author_name, String publisher_name, String published_date, String book_title, String book_description, String thumbnail_address,String info_link, String id, ArrayList<String> tags, Boolean favorite){
         this.author_name = author_name;
         this.publisher_name = publisher_name;
@@ -33,12 +32,13 @@ public class BookItem implements Serializable {
         this.favorite = favorite;
 
     }
+
     public int getStatus(){return(status);}
     public void setStatus(int s){status = s;}
     public void setProgress(int i){progress = i;}
     public int getProgress(){return(progress);}
-    public float getRaiting(){return(rating);}
-    public void setRaitng(float s){rating = s;}
+    public float getRating(){return(rating);}
+    public void setRating(float s){rating = s;}
     public String getNotes(){return(notes);}
     public void setNotes(String s){notes = s;}
     public String getAuthor_name(){

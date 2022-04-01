@@ -3,6 +3,7 @@ package com.prince.readstack;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -10,7 +11,6 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -20,7 +20,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -68,7 +67,7 @@ public class BookAddedDetails extends AppCompatActivity{
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.book_added_details2);
+        setContentView(R.layout.book_added_details);
         getSupportActionBar().hide();
         author_view = findViewById(R.id.author_text);
         publisher_view = findViewById(R.id.publisher_text);
@@ -91,6 +90,13 @@ public class BookAddedDetails extends AppCompatActivity{
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_spinner_array, R.layout.status_spinner);
         adapter.setDropDownViewResource(R.layout.status_spinner_dropdown);
+        switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+            case Configuration.UI_MODE_NIGHT_YES:
+
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                break;
+        }
         status_spinner.setPrompt("Status");
         status_spinner.setAdapter(new CustomSpinnerAdapter(adapter, R.layout.status_spinner_default, this));
         status_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -100,7 +106,7 @@ public class BookAddedDetails extends AppCompatActivity{
                     progressBarLayout.setVisibility(View.GONE);
                     rating.setVisibility(View.VISIBLE);
                     try {
-                        rating.setRating(book.getRaiting());
+                        rating.setRating(book.getRating());
                     }
                     catch (NullPointerException e){
                     }
@@ -187,6 +193,7 @@ public class BookAddedDetails extends AppCompatActivity{
         }
         catch (NullPointerException e){}
         tag_button.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
                 showTagList();
@@ -297,7 +304,7 @@ public class BookAddedDetails extends AppCompatActivity{
         book.setNotes(comments.getText().toString());
         book.setStatus(status_spinner.getSelectedItemPosition());
         book.setProgress(progress.getProgress());
-        book.setRaitng(rating.getRating());
+        book.setRating(rating.getRating());
         file.delete();
         try {
             fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
@@ -364,50 +371,52 @@ public class BookAddedDetails extends AppCompatActivity{
             for (int i = 0; i < bookTags.size(); i++) {
                 int index = tagList.findIndex(bookTags.get(i));
                 checkedItems[index] = true;
+                addTags.add(bookTags.get(i));
             }
         }
         catch (NullPointerException e){
+            bookTags = new ArrayList<>();
             e.printStackTrace();
         }
         catch (ArrayIndexOutOfBoundsException e){
+            bookTags = new ArrayList<>();
             e.printStackTrace();
         }
         String[] tagDisplayArray = tagList.toArray();
-        //Displays checklist
         builder.setMultiChoiceItems(tagDisplayArray, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                String toAdd = tagDisplayArray[which];
-                if(addTags.contains(tagDisplayArray[which])){
-                    addTags.remove(tagDisplayArray[which]);
-                    checkedItems[which] = false;
+                String selectedTag = tagDisplayArray[which];
+                if(checkedItems[which]){
+                    checkedItems[which] = true;
+                    if(addTags.contains(tagDisplayArray[which])){
+                    }
+                    else{
+                        addTags.add(tagDisplayArray[which]);
+                        Log.d("Adding", tagDisplayArray[which]);
+                    }
                 }
                 else {
-                    addTags.add(toAdd);
-                    checkedItems[which] = true;
+                    checkedItems[which] = false;
+                    addTags.remove(tagDisplayArray[which]);
                 }
             }
             //Save changes to tags/applies tags
         }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                for(int i=0; i<addTags.size(); i++){
-                    try {
-                        if (bookTags.contains(addTags.get(i))) {
-                        } else {
-                            book.addTag(addTags.get(i));
-                        }
+                ArrayList<String> uni = new ArrayList<>();
+                for(int c = 0; c<addTags.size(); c++){
+                    if(uni.contains(addTags.get(c))){
                     }
-                    catch (NullPointerException e){
-                        book.addTag(addTags.get(i));
+                    else{
+                        uni.add(addTags.get(c));
                     }
                 }
-                try {
-                    for (int c = 0; c < bookTags.size(); c++) {
-                        addTags.add(bookTags.get(c));
-                    }
-                }
-                catch (NullPointerException e){
+                for(int i =0; i< uni.size(); i++){
+                    book.addTag(uni.get(i));
+                    Log.d("Adding", uni.get(i));
+
                 }
                 file.delete();
                 try {
@@ -417,7 +426,9 @@ public class BookAddedDetails extends AppCompatActivity{
                 catch (Exception e){
                     e.printStackTrace();
                 }
+                addTags.clear();
                 writeToFile(gson.toJson(bookStore));
+                Log.d("Adding", "Printed to file");
             }
         });
 

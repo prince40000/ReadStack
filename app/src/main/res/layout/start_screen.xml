@@ -10,10 +10,10 @@
         android:id="@+id/logo_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@drawable/ic_readstack_welcome_screen"
+        app:srcCompat="@drawable/readstack_welcome_screen"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="0dp"
-        tools:srcCompat="@drawable/ic_readstack_welcome_screen" />
+        tools:srcCompat="@drawable/readstack_welcome_screen" />
 
     <Button
         android:id="@+id/enter_button"
@@ -29,8 +29,8 @@
 
     <TextView
         android:id="@+id/appNameView"
-        android:layout_width="320dp"
-        android:layout_height="70dp"
+        android:layout_width="397dp"
+        android:layout_height="114dp"
         android:autoText="false"
         android:fontFamily="@font/readstack_font"
         android:gravity="center"
@@ -41,8 +41,8 @@
         app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.077" />
+        app:layout_constraintVertical_bias="0.121" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,6 @@
 package com.prince.readstack;
 
 import android.app.AlertDialog;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,10 +12,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.PopupMenu;
+
 import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
@@ -26,19 +23,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.prince.readstack.BookStore;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.prince.readstack.BookGridAdapter;
-import com.prince.readstack.BookItem;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -66,7 +58,7 @@ public class MainList extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        setContentView(R.layout.main_list_v2);
+        setContentView(R.layout.main_list);
         create();
 
         //CHECKS IF FILE EXISTS, CREATES OUTPUT STREAM IF IT DOES
@@ -165,16 +157,18 @@ public class MainList extends AppCompatActivity{
                 ArrayList<BookItem> filterList = new ArrayList<>();
                 Log.d("TagSearch", "Seraching for " + s);
                 if(!s.equals("")) {
-                    for (int i = 0; i < printList.size(); i++) {
-                        try {
+                    try {
+                        for (int i = 0; i < printList.size(); i++) {
+
                             for (int c = 0; c < printList.get(i).getTags().size(); c++) {
                                 if (printList.get(i).getTags().get(c).equals(s)) {
                                     filterList.add(printList.get(i));
                                 }
                             }
-                        } catch (NullPointerException e) {
                         }
                     }
+                    catch (NullPointerException e) {
+                        }
                 }
                 else{
                     filterList = printList;
@@ -314,7 +308,7 @@ public class MainList extends AppCompatActivity{
             public void onClick(DialogInterface dialog, int id) {
                 try{
                     File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), FILE_NAME);
-                    importReader = new FileReader(file.getAbsolutePath());
+                     importReader = new FileReader(file.getAbsolutePath());
                     bookStore = gson.fromJson(importReader, BookStore.class);
                     writeToFile(gson.toJson(bookStore), MainList.this);
                 } catch (FileNotFoundException e) {

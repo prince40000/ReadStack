@@ -59,7 +59,8 @@
                     android:autoSizeMaxTextSize="25dp"
                     android:autoSizeMinTextSize="12dp"
                     android:autoSizeTextType="uniform"
-                    android:text="title_text" />
+                    android:text="title_text"
+                    android:textColor="@color/slate" />
 
                 <TextView
                     android:id="@+id/author_text"
@@ -70,7 +71,8 @@
                     android:autoSizeMaxTextSize="25dp"
                     android:autoSizeMinTextSize="12dp"
                     android:autoSizeTextType="uniform"
-                    android:text="author_text" />
+                    android:text="author_text"
+                    android:textColor="@color/slate"/>
 
                 <TextView
                     android:id="@+id/publisher_text"
@@ -81,7 +83,8 @@
                     android:autoSizeMaxTextSize="25dp"
                     android:autoSizeMinTextSize="12dp"
                     android:autoSizeTextType="uniform"
-                    android:text="publisher_text" />
+                    android:text="publisher_text"
+                    android:textColor="@color/slate"/>
 
                 <TextView
                     android:id="@+id/publish_date_text"
@@ -96,12 +99,12 @@
 
                 <Spinner
                     android:id="@+id/status_spinner"
-                    style="@style/Widget.MaterialComponents.TextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight=".2"
                     android:autoSizeMaxTextSize="25dp"
                     android:autoSizeMinTextSize="12dp"
+                    android:textColor="@color/slate"
                     android:autoSizeTextType="uniform"
                     android:dropDownWidth="match_parent"
                     tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
@@ -182,7 +185,8 @@
                 android:minLines="10"
                 android:scrollbars="vertical"
                 android:text="description_text"
-                android:windowSoftInputMode="stateHidden" />
+                android:windowSoftInputMode="stateHidden"
+                android:textColor="@color/slate"/>
 
             <Space
                 android:layout_width="match_parent"
@@ -198,7 +202,8 @@
                 android:maxHeight="450dp"
                 android:scrollbars="vertical"
                 android:text="Notes"
-                android:textAlignment="textStart" />
+                android:textAlignment="textStart"
+                android:textColor="@color/slate"/>
 
             <Space
                 android:layout_width="match_parent"
