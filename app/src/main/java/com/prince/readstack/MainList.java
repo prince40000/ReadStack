@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -239,7 +242,7 @@ public class MainList extends AppCompatActivity{
     }
     public void tagManagerAlert(){
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle("Tags");
+        builder.setTitle("Select tag(s) to remove");
         TagStore tagList;
         ArrayList<String> removeTags = new ArrayList<>();
         try{
@@ -266,7 +269,7 @@ public class MainList extends AppCompatActivity{
                     Log.d("Checker", removeTags.toString());
                 }
             }
-        }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
+        }).setPositiveButton("Remove Tag(s)", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d("Checker", removeTags.toString());
@@ -459,36 +462,30 @@ public class MainList extends AppCompatActivity{
         new_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainList.this, BookSearch.class);
-                MainList.this.startActivity(i);
-            }
-        });
-        /*
-        debug_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                try {
-                    reader = new FileReader(file.getAbsolutePath());
-                    storedStore = gson.fromJson(reader, BookStore.class);
-                    reader.close();
-                    storedStore.duplicate();
-                    file.delete();
-                    file.createNewFile();
-                    try {
-                        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(MainList.this.openFileOutput(FILE_NAME, Context.MODE_APPEND));
-                        outputStreamWriter.append(gson.toJson(storedStore));
-                        outputStreamWriter.close();
-                    }
-                    catch (IOException e) {
-                        Log.e("Exception", "File write failed: " + e.toString());
-                    }
+                if(isConnectedToInternet()) {
+                    Intent i = new Intent(MainList.this, BookSearch.class);
+                    MainList.this.startActivity(i);
                 }
-                catch (IOException e){
-                    newBookStore = new BookStore();
-                    newBookStore.addBook(newBook);
-                    //Log.d("CHECKTEST", String.valueOf(e));
+                else{
+                    Toast.makeText(getBaseContext(), "Cannot search without internet connection.", Toast.LENGTH_LONG).show();
                 }
             }
         });
-         */
+    }
+
+    public boolean isConnectedToInternet(){
+        ConnectivityManager connectivity = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null)
+        {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null)
+                for (int i = 0; i < info.length; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
+                    {
+                        return true;
+                    }
+
+        }
+        return false;
     }
 }

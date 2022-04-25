@@ -2,11 +2,15 @@ package com.prince.readstack;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
@@ -20,6 +24,7 @@ public class BookGridAdapter extends RecyclerView.Adapter<BookGridAdapter.ViewHo
     private ItemClickListener mClickListener;
     private String whoCalled;
     private Context myContext;
+
 
     // data is passed into the constructor
     BookGridAdapter(Context context, ArrayList<BookItem> data, String caller) {
@@ -42,6 +47,7 @@ public class BookGridAdapter extends RecyclerView.Adapter<BookGridAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         BookItem bookItem = bookItemList.get(position);
         Picasso.get().load(bookItemList.get(position).getThumbnail_address()).into(holder.myImageView);
+        holder.myTextView.setText(bookItem.getBook_title());
 
         holder.itemView.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -88,10 +94,19 @@ public class BookGridAdapter extends RecyclerView.Adapter<BookGridAdapter.ViewHo
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView myImageView;
-
+        TextView myTextView;
         ViewHolder(View itemView) {
             super(itemView);
             myImageView = itemView.findViewById(R.id.mainListItem);
+            myTextView = itemView.findViewById(R.id.altListItem);
+            if(isConnectedToInternet()){
+                myImageView.setVisibility(View.VISIBLE);
+                myTextView.setVisibility(View.GONE);
+            }
+            else{
+                myTextView.setVisibility(View.VISIBLE);
+                myImageView.setVisibility(View.GONE);
+            }
             itemView.setOnClickListener(this);
         }
 
@@ -114,6 +129,21 @@ public class BookGridAdapter extends RecyclerView.Adapter<BookGridAdapter.ViewHo
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position);
+    }
+    public boolean isConnectedToInternet(){
+        ConnectivityManager connectivity = (ConnectivityManager) myContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null)
+        {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null)
+                for (int i = 0; i < info.length; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
+                    {
+                        return true;
+                    }
+
+        }
+        return false;
     }
 }
 

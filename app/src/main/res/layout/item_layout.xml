@@ -23,4 +23,16 @@
         android:paddingRight="2dp"
         android:paddingBottom="2dp"
         android:scaleType="fitXY" />
+
+    <TextView
+        android:id="@+id/altListItem"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:layout_weight="1"
+        android:text="TextView"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="12dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeStepGranularity="1dp"
+        tools:visibility="gone" />
 </LinearLayout>

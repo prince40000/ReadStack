@@ -1,7 +1,10 @@
 package com.prince.readstack;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -45,13 +48,6 @@ public class BookSearch extends AppCompatActivity {
         search_spinner.setAdapter(adapter);
         searchBar = findViewById(R.id.search_bar_view);
         searchButton = findViewById(R.id.search_button);
-        /*try {
-            if (getIntent().getStringExtra("calling_class").equals("AddBook")) {
-                searchBar.setText(getIntent().getStringExtra("title"));
-            }
-        }
-        catch (RuntimeException e){
-        }*/
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,6 +137,7 @@ public class BookSearch extends AppCompatActivity {
         });
         myQueue.add(bookRequest);
     }
+
     public boolean onKeyDown(int keyCode, KeyEvent event){
         switch(keyCode){
             case KeyEvent.KEYCODE_ENTER:

@@ -5,7 +5,7 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('C:\\Users\\eprince\\.android\\debug.keystore')
+            storeFile file('C:\\Users\\princ\\.android\\debug.keystore')
         }
     }
     compileSdkVersion 30
@@ -15,8 +15,8 @@ android {
         applicationId "com.prince.readstack"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug

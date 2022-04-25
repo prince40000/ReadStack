@@ -198,9 +198,11 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".75"
                 android:gravity="top|left"
-                android:inputType="textPersonName"
+                android:inputType="textMultiLine"
                 android:maxHeight="450dp"
                 android:scrollbars="vertical"
+                android:scrollHorizontally="false"
+                android:singleLine="false"
                 android:text="Notes"
                 android:textAlignment="textStart"
                 android:textColor="@color/slate"/>

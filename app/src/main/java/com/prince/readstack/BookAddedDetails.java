@@ -247,30 +247,7 @@ public class BookAddedDetails extends AppCompatActivity{
         remove_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    //Opens file and reader, imports bookStore from JSON
-                    //file = new File(getFilesDir(), FILE_NAME);
-                    //reader = new FileReader(file.getAbsoluteFile());
-                    //bookStore = gson.fromJson(reader, BookStore.class);
-
-                    //Deletes existing JSON file, creates a new blank one
-                    file.delete();
-                    fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
-                    fos.close();
-
-                    //Removes book from bookStore, writes new bookStore to JSON
-                    bookStore.removeBook(book.id);
-                    writeToFile(gson.toJson(bookStore));
-                    reader.close();
-
-                    //Moves back to main display screen
-                    Intent i = new Intent(BookAddedDetails.this, MainList.class);
-                    i.putExtra("calling_class", "BookAddedDetails");
-                    BookAddedDetails.this.startActivity(i);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
+                removeAlert();
             }
         });
 
@@ -492,6 +469,42 @@ public class BookAddedDetails extends AppCompatActivity{
         dialog.create();
         dialog.show();
     }
+    public void removeAlert(){
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(BookAddedDetails.this);
+        builder.setMessage("Are you sure?");
+
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                try {
+                    file.delete();
+                    fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);
+                    fos.close();
+                    bookStore.removeBook(book.id);
+                    writeToFile(gson.toJson(bookStore));
+                    reader.close();
+                    Intent i = new Intent(BookAddedDetails.this, MainList.class);
+                    i.putExtra("calling_class", "BookAddedDetails");
+                    BookAddedDetails.this.startActivity(i);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        builder.setNeutralButton("CANCEL", new DialogInterface.OnClickListener()     {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        android.app.AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     public boolean onKeyDown(int keyCode, KeyEvent event){
         switch(keyCode){
             case KeyEvent.KEYCODE_BACK:
