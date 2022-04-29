@@ -5,7 +5,7 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('C:\\Users\\princ\\.android\\debug.keystore')
+            storeFile file('C:\\Users\\eprince\\.android\\debug.keystore')
         }
     }
     compileSdkVersion 30

@@ -220,6 +220,11 @@ public class MainList extends AppCompatActivity{
             case R.id.menu_tags:
                 tagManagerAlert();
                 return true;
+            case R.id.menu_about:
+                Log.d("MENU", "About Selected");
+                Intent i = new Intent(MainList.this, About.class);
+                MainList.this.startActivity(i);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

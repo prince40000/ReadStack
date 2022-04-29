@@ -18,6 +18,7 @@
         <activity android:name="com.prince.readstack.BookSearch"></activity>
         <activity android:name="com.prince.readstack.AddBook"></activity>
         <activity android:name="com.prince.readstack.MainList"></activity>
+        <activity android:name="com.prince.readstack.About"></activity>
         <activity android:name="com.prince.readstack.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,5 +27,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>
